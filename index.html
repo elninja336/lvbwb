@@ -1,649 +1,232 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Mwanza Victoria Basin Water & Flood Management System</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
-  min-height: 100vh;
-}
-
-.container {
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: 15px;
-}
-
-.header {
-  background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
-  color: white;
-  border-radius: 15px;
-  padding: 25px;
-  margin-bottom: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  border: 2px solid rgba(255,255,255,0.1);
-}
-
-.header h1 {
-  font-size: 2.2em;
-  margin-bottom: 8px;
-  font-weight: 700;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-.header p {
-  font-size: 1em;
-  opacity: 0.95;
-}
-
-.main-layout {
-  display: grid;
-  grid-template-columns: 320px 1fr 280px;
-  gap: 15px;
-}
-
-.panel {
-  background: white;
-  border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-  max-height: 85vh;
-  overflow-y: auto;
-}
-
-.panel::-webkit-scrollbar {
-  width: 6px;
-}
-
-.panel::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.panel::-webkit-scrollbar-thumb {
-  background: #1976d2;
-  border-radius: 10px;
-}
-
-.section-title {
-  color: #0d47a1;
-  font-size: 1.2em;
-  font-weight: 700;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 3px solid #1976d2;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-  color: white;
-  padding: 15px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-}
-
-.stat-card.warning {
-  background: linear-gradient(135deg, #fb8c00 0%, #f57c00 100%);
-}
-
-.stat-card.danger {
-  background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
-}
-
-.stat-card.success {
-  background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
-}
-
-.stat-card .value {
-  font-size: 2em;
-  font-weight: bold;
-  display: block;
-}
-
-.stat-card .label {
-  font-size: 0.85em;
-  opacity: 0.95;
-  margin-top: 5px;
-}
-
-.layer-control {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 12px;
-  border: 2px solid #e0e0e0;
-  transition: all 0.3s;
-}
-
-.layer-control:hover {
-  border-color: #1976d2;
-  background: #e3f2fd;
-}
-
-.layer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  font-weight: 600;
-  color: #333;
-}
-
-.layer-header span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.layer-options {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e0e0e0;
-  display: none;
-}
-
-.layer-options.active {
-  display: block;
-}
-
-.layer-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 8px 0;
-  font-size: 0.9em;
-}
-
-.layer-option input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.layer-option input[type="range"] {
-  flex: 1;
-  cursor: pointer;
-}
-
-.map-container {
-  background: white;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-}
-
-#map {
-  height: 78vh;
-  border-radius: 10px;
-  border: 2px solid #e0e0e0;
-}
-
-.data-source-tag {
-  background: #e3f2fd;
-  color: #0d47a1;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 0.75em;
-  font-weight: 600;
-  margin-left: 5px;
-}
-
-.btn {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-bottom: 8px;
-  transition: all 0.3s;
-  font-size: 0.9em;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-  color: white;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
-}
-
-.btn-success {
-  background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
-  color: white;
-}
-
-.btn-warning {
-  background: linear-gradient(135deg, #fb8c00 0%, #f57c00 100%);
-  color: white;
-}
-
-.info-box {
-  background: #e3f2fd;
-  border-left: 4px solid #1976d2;
-  padding: 12px;
-  border-radius: 6px;
-  margin: 12px 0;
-  font-size: 0.9em;
-}
-
-.info-box.warning {
-  background: #fff3e0;
-  border-left-color: #fb8c00;
-}
-
-.info-box.danger {
-  background: #ffebee;
-  border-left-color: #e53935;
-}
-
-.chart-container {
-  margin: 15px 0;
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-  margin: 5px 0;
-  background: #f8f9fa;
-  border-radius: 6px;
-  font-size: 0.9em;
-}
-
-.legend-color {
-  width: 30px;
-  height: 20px;
-  border-radius: 4px;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 0.85em;
-}
-
-.data-table th {
-  background: #1976d2;
-  color: white;
-  padding: 8px;
-  text-align: left;
-}
-
-.data-table td {
-  padding: 8px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.data-table tr:hover {
-  background: #f5f5f5;
-}
-
-.popup-content {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.popup-content h4 {
-  color: #0d47a1;
-  margin-bottom: 8px;
-  border-bottom: 2px solid #1976d2;
-  padding-bottom: 5px;
-}
-
-.popup-content p {
-  margin: 5px 0;
-  font-size: 0.9em;
-}
-
-.badge {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  font-weight: 600;
-}
-
-.badge-danger {
-  background: #ffcdd2;
-  color: #c62828;
-}
-
-.badge-warning {
-  background: #ffe0b2;
-  color: #e65100;
-}
-
-.badge-success {
-  background: #c8e6c9;
-  color: #2e7d32;
-}
-
-/* Pulse animation for markers */
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.pulse-marker {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-/* Fade in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.8s ease-in;
-}
-
-/* River flow animation */
-@keyframes flowRiver {
-  0% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: -50;
-  }
-}
-
-/* Ripple effect for flood zones */
-@keyframes ripple {
-  0% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.4;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-}
-
-/* Glow effect for elevation zones */
-@keyframes glow {
-  0%, 100% {
-    filter: brightness(1);
-  }
-  50% {
-    filter: brightness(1.2);
-  }
-}
-
-/* Shimmer for land use */
-@keyframes shimmer {
-  0% {
-    opacity: 0.25;
-  }
-  50% {
-    opacity: 0.4;
-  }
-  100% {
-    opacity: 0.25;
-  }
-}
-
-/* Breathing effect for population */
-@keyframes breathe {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.02);
-    opacity: 0.7;
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 1400px) {
-  .main-layout {
-    grid-template-columns: 280px 1fr;
-  }
-  
-  .right-panel {
-    grid-column: 1 / -1;
-    max-height: 400px;
-  }
-}
-
-@media (max-width: 992px) {
-  .header h1 {
-    font-size: 1.5em;
-  }
-  
-  .header p {
-    font-size: 0.9em;
-  }
-  
-  .main-layout {
-    grid-template-columns: 1fr;
-  }
-  
-  .panel {
-    max-height: none;
-  }
-  
-  #map {
-    height: 50vh;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
-  
-  .header {
-    padding: 15px;
-  }
-  
-  .header h1 {
-    font-size: 1.3em;
-  }
-  
-  .panel {
-    padding: 12px;
-  }
-  
-  .section-title {
-    font-size: 1em;
-  }
-  
-  #map {
-    height: 40vh;
-  }
-}
-
-@media (max-width: 480px) {
-  .header h1 {
-    font-size: 1.1em;
-  }
-  
-  .header p {
-    font-size: 0.8em;
-  }
-  
-  .stat-card .value {
-    font-size: 1.5em;
-  }
-  
-  .stat-card .label {
-    font-size: 0.75em;
-  }
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-  <div class="header">
-    <h1>🌊 Mwanza Victoria Basin Water & Flood Management System</h1>
-    <p>🗺️ Integrated GIS Platform | Real-time Flood Monitoring | Infrastructure Management</p>
-  </div>
-
-  <div class="main-layout">
-    <!-- LEFT PANEL: Data Layers -->
-    <div class="panel">
-      <div class="section-title">🗺️ GIS Data Layers</div>
-      
-      <!-- Administrative Boundaries -->
-      <div class="layer-control">
-        <div class="layer-header" onclick="toggleLayerOptions('admin')">
-          <span>🏛️ Administrative Boundaries <span class="data-source-tag">NBS</span></span>
-          <input type="checkbox" id="layerAdmin" checked onchange="toggleMainLayer('admin')" onclick="event.stopPropagation()">
-        </div>
-        <div class="layer-options" id="options-admin">
-          <div class="layer-option">
-            <!-- <input type="checkbox" id="sublayer-wards" checked onchange="toggleSubLayer('wards')">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mwanza Victoria Basin Water & Flood Management System</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🌊 Mwanza Victoria Basin Water & Flood Management System</h1>
+        <p>
+          🗺️ Integrated GIS Platform | Real-time Flood Monitoring |
+          Infrastructure Management
+        </p>
+      </div>
+
+      <div class="main-layout">
+        <!-- LEFT PANEL: Data Layers -->
+        <div class="panel">
+          <div class="section-title">🗺️ GIS Data Layers</div>
+
+          <!-- Administrative Boundaries -->
+          <div class="layer-control">
+            <div class="layer-header" onclick="toggleLayerOptions('admin')">
+              <span
+                >🏛️ Administrative Boundaries
+                <span class="data-source-tag">NBS</span></span
+              >
+              <input
+                type="checkbox"
+                id="layerAdmin"
+                checked
+                onchange="toggleMainLayer('admin')"
+                onclick="event.stopPropagation()"
+              />
+            </div>
+            <div class="layer-options" id="options-admin">
+              <div class="layer-option">
+                <!-- <input type="checkbox" id="sublayer-wards" checked onchange="toggleSubLayer('wards')">
             <label>City Wards</label> -->
-          </div>
-          <div class="layer-option">
-            <!-- <input type="checkbox" id="sublayer-streets" checked onchange="toggleSubLayer('streets')">
+              </div>
+              <div class="layer-option">
+                <!-- <input type="checkbox" id="sublayer-streets" checked onchange="toggleSubLayer('streets')">
             <label>Streets</label> -->
+              </div>
+              <div class="layer-option">
+                <label>Opacity:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="70"
+                  onchange="changeOpacity('admin', this.value)"
+                />
+              </div>
+            </div>
           </div>
-          <div class="layer-option">
-            <label>Opacity:</label>
-            <input type="range" min="0" max="100" value="70" onchange="changeOpacity('admin', this.value)">
-          </div>
-        </div>
-      </div>
 
-      <!-- River Network -->
-      <div class="layer-control">
-        <div class="layer-header" onclick="toggleLayerOptions('rivers')">
-          <span>🌊 River Network <span class="data-source-tag">HydroSHEDS</span></span>
-          <input type="checkbox" id="layerRivers" checked onchange="toggleMainLayer('rivers')" onclick="event.stopPropagation()">
-        </div>
-        <div class="layer-options" id="options-rivers">
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-mirongo" checked onchange="toggleSubLayer('mirongo')">
-            <label>Mirongo River</label>
+          <!-- River Network -->
+          <div class="layer-control">
+            <div class="layer-header" onclick="toggleLayerOptions('rivers')">
+              <span
+                >🌊 River Network
+                <span class="data-source-tag">HydroSHEDS</span></span
+              >
+              <input
+                type="checkbox"
+                id="layerRivers"
+                checked
+                onchange="toggleMainLayer('rivers')"
+                onclick="event.stopPropagation()"
+              />
+            </div>
+            <div class="layer-options" id="options-rivers">
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-mirongo"
+                  checked
+                  onchange="toggleSubLayer('mirongo')"
+                />
+                <label>Mirongo River</label>
+              </div>
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-tributaries"
+                  checked
+                  onchange="toggleSubLayer('tributaries')"
+                />
+                <label>Tributaries</label>
+              </div>
+            </div>
           </div>
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-tributaries" checked onchange="toggleSubLayer('tributaries')">
-            <label>Tributaries</label>
-          </div>
-        </div>
-      </div>
 
-      <!-- Digital Elevation Model -->
-      <div class="layer-control">
-        <div class="layer-header" onclick="toggleLayerOptions('dem')">
-          <span>⛰️ Elevation (DEM) <span class="data-source-tag">NASA SRTM</span></span>
-          <input type="checkbox" id="layerDEM" checked onchange="toggleMainLayer('dem')" onclick="event.stopPropagation()">
-        </div>
-        <div class="layer-options" id="options-dem">
-          <div class="layer-option">
-            <label>Elevation Range: <span id="demRange">0-200m</span></label>
-            <input type="range" min="0" max="200" value="200" onchange="updateDEMRange(this.value)">
+          <!-- Digital Elevation Model -->
+          <div class="layer-control">
+            <div class="layer-header" onclick="toggleLayerOptions('dem')">
+              <span
+                >⛰️ Elevation (DEM)
+                <span class="data-source-tag">NASA SRTM</span></span
+              >
+              <input
+                type="checkbox"
+                id="layerDEM"
+                checked
+                onchange="toggleMainLayer('dem')"
+                onclick="event.stopPropagation()"
+              />
+            </div>
+            <div class="layer-options" id="options-dem">
+              <div class="layer-option">
+                <label
+                  >Elevation Range: <span id="demRange">0-200m</span></label
+                >
+                <input
+                  type="range"
+                  min="0"
+                  max="200"
+                  value="200"
+                  onchange="updateDEMRange(this.value)"
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Land Use / Land Cover -->
-      <div class="layer-control">
-        <div class="layer-header" onclick="toggleLayerOptions('lulc')">
-          <span>🌳 Land Use/Cover <span class="data-source-tag">ESA</span></span>
-          <input type="checkbox" id="layerLULC" checked onchange="toggleMainLayer('lulc')" onclick="event.stopPropagation()">
-        </div>
-        <div class="layer-options" id="options-lulc">
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-urban" checked onchange="toggleSubLayer('urban')">
-            <label>Urban Areas</label>
+          <!-- Land Use / Land Cover -->
+          <div class="layer-control">
+            <div class="layer-header" onclick="toggleLayerOptions('lulc')">
+              <span
+                >🌳 Land Use/Cover
+                <span class="data-source-tag">ESA</span></span
+              >
+              <input
+                type="checkbox"
+                id="layerLULC"
+                checked
+                onchange="toggleMainLayer('lulc')"
+                onclick="event.stopPropagation()"
+              />
+            </div>
+            <div class="layer-options" id="options-lulc">
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-urban"
+                  checked
+                  onchange="toggleSubLayer('urban')"
+                />
+                <label>Urban Areas</label>
+              </div>
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-vegetation"
+                  checked
+                  onchange="toggleSubLayer('vegetation')"
+                />
+                <label>Vegetation</label>
+              </div>
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-water"
+                  checked
+                  onchange="toggleSubLayer('water')"
+                />
+                <label>Water Bodies</label>
+              </div>
+            </div>
           </div>
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-vegetation" checked onchange="toggleSubLayer('vegetation')">
-            <label>Vegetation</label>
-          </div>
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-water" checked onchange="toggleSubLayer('water')">
-            <label>Water Bodies</label>
-          </div>
-        </div>
-      </div>
 
-      <!-- Flood Hazard Zones -->
-      <div class="layer-control">
-        <div class="layer-header" onclick="toggleLayerOptions('flood')">
-          <span>⚠️ Flood Hazard Zones <span class="data-source-tag">GFDRR</span></span>
-          <input type="checkbox" id="layerFlood" checked onchange="toggleMainLayer('flood')" onclick="event.stopPropagation()">
-        </div>
-        <div class="layer-options" id="options-flood">
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-high" checked onchange="toggleSubLayer('high')">
-            <label>High Risk (10-year)</label>
+          <!-- Flood Hazard Zones -->
+          <div class="layer-control">
+            <div class="layer-header" onclick="toggleLayerOptions('flood')">
+              <span
+                >⚠️ Flood Hazard Zones
+                <span class="data-source-tag">GFDRR</span></span
+              >
+              <input
+                type="checkbox"
+                id="layerFlood"
+                checked
+                onchange="toggleMainLayer('flood')"
+                onclick="event.stopPropagation()"
+              />
+            </div>
+            <div class="layer-options" id="options-flood">
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-high"
+                  checked
+                  onchange="toggleSubLayer('high')"
+                />
+                <label>High Risk (10-year)</label>
+              </div>
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-medium"
+                  checked
+                  onchange="toggleSubLayer('medium')"
+                />
+                <label>Medium Risk (25-year)</label>
+              </div>
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-low"
+                  checked
+                  onchange="toggleSubLayer('low')"
+                />
+                <label>Low Risk (100-year)</label>
+              </div>
+            </div>
           </div>
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-medium" checked onchange="toggleSubLayer('medium')">
-            <label>Medium Risk (25-year)</label>
-          </div>
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-low" checked onchange="toggleSubLayer('low')">
-            <label>Low Risk (100-year)</label>
-          </div>
-        </div>
-      </div>
 
-      <!-- Infrastructure -->
-      <!-- <div class="layer-control">
+          <!-- Infrastructure -->
+          <!-- <div class="layer-control">
         <div class="layer-header" onclick="toggleLayerOptions('infrastructure')">
           <span>🏥 Critical Infrastructure <span class="data-source-tag">OSM</span></span>
           <input type="checkbox" id="layerInfra" checked onchange="toggleMainLayer('infrastructure')" onclick="event.stopPropagation()">
@@ -664,26 +247,48 @@ body {
         </div>
       </div> -->
 
-      <!-- Infrastructure -->
-      <div class="layer-control">
-        <div class="layer-header" onclick="toggleLayerOptions('infrastructure')">
-          <span>🏥 Critical Infrastructure <span class="data-source-tag">OSM</span></span>
-          <input type="checkbox" id="layerInfra" checked onchange="toggleMainLayer('infrastructure')" onclick="event.stopPropagation()">
-        </div>
-        <div class="layer-options" id="options-infrastructure">
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-hospitals" checked onchange="toggleSubLayer('hospitals')">
-            <label>Hospitals</label>
+          <!-- Infrastructure -->
+          <div class="layer-control">
+            <div
+              class="layer-header"
+              onclick="toggleLayerOptions('infrastructure')"
+            >
+              <span
+                >🏥 Critical Infrastructure
+                <span class="data-source-tag">OSM</span></span
+              >
+              <input
+                type="checkbox"
+                id="layerInfra"
+                checked
+                onchange="toggleMainLayer('infrastructure')"
+                onclick="event.stopPropagation()"
+              />
+            </div>
+            <div class="layer-options" id="options-infrastructure">
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-hospitals"
+                  checked
+                  onchange="toggleSubLayer('hospitals')"
+                />
+                <label>Hospitals</label>
+              </div>
+              <div class="layer-option">
+                <input
+                  type="checkbox"
+                  id="sublayer-schools"
+                  checked
+                  onchange="toggleSubLayer('schools')"
+                />
+                <label>Schools</label>
+              </div>
+            </div>
           </div>
-          <div class="layer-option">
-            <input type="checkbox" id="sublayer-schools" checked onchange="toggleSubLayer('schools')">
-            <label>Schools</label>
-          </div>
-        </div>
-      </div>
 
-      <!-- Water Supply Network -->
-      <!-- <div class="layer-control">
+          <!-- Water Supply Network -->
+          <!-- <div class="layer-control">
         <div class="layer-header" onclick="toggleLayerOptions('supply')">
           <span>🚰 Water Supply Network <span class="data-source-tag">LVBWB</span></span>
           <input type="checkbox" id="layerSupply" checked onchange="toggleMainLayer('supply')" onclick="event.stopPropagation()">
@@ -700,74 +305,142 @@ body {
         </div>
       </div> -->
 
-      <!-- Water Clients -->
-      <!-- <div class="layer-control">
+          <!-- Water Clients -->
+          <!-- <div class="layer-control">
         <div class="layer-header" onclick="toggleLayerOptions('clients')">
           <span>👥 Water Board Clients</span>
           <input type="checkbox" id="layerClients" checked onchange="toggleMainLayer('clients')" onclick="event.stopPropagation()">
         </div>
       </div> -->
 
-      <!-- Population Density -->
-      <div class="layer-control">
-        <div class="layer-header" onclick="toggleLayerOptions('population')">
-          <span>👨‍👩‍👧‍👦 Population Density <span class="data-source-tag">NBS</span></span>
-          <input type="checkbox" id="layerPopulation" checked onchange="toggleMainLayer('population')" onclick="event.stopPropagation()">
-        </div>
-        <div class="layer-options" id="options-population">
-          <div class="info-box" style="margin-top: 10px;">
-            <strong>📊 Legend:</strong><br>
-            <div style="display: flex; align-items: center; gap: 5px; margin-top: 5px;">
-              <div style="width: 20px; height: 20px; background: #2e7d32; border-radius: 3px;"></div>
-              <small>Low (&lt;2000)</small>
+          <!-- Population Density -->
+          <div class="layer-control">
+            <div
+              class="layer-header"
+              onclick="toggleLayerOptions('population')"
+            >
+              <span
+                >👨‍👩‍👧‍👦 Population Density
+                <span class="data-source-tag">NBS</span></span
+              >
+              <input
+                type="checkbox"
+                id="layerPopulation"
+                checked
+                onchange="toggleMainLayer('population')"
+                onclick="event.stopPropagation()"
+              />
             </div>
-            <div style="display: flex; align-items: center; gap: 5px; margin-top: 3px;">
-              <div style="width: 20px; height: 20px; background: #fbc02d; border-radius: 3px;"></div>
-              <small>Medium (2000-6000)</small>
-            </div>
-            <div style="display: flex; align-items: center; gap: 5px; margin-top: 3px;">
-              <div style="width: 20px; height: 20px; background: #f57c00; border-radius: 3px;"></div>
-              <small>High (6000-10000)</small>
-            </div>
-            <div style="display: flex; align-items: center; gap: 5px; margin-top: 3px;">
-              <div style="width: 20px; height: 20px; background: #d32f2f; border-radius: 3px;"></div>
-              <small>Very High (&gt;10000)</small>
+            <div class="layer-options" id="options-population">
+              <div class="info-box" style="margin-top: 10px">
+                <strong>📊 Legend:</strong><br />
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    margin-top: 5px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 20px;
+                      height: 20px;
+                      background: #2e7d32;
+                      border-radius: 3px;
+                    "
+                  ></div>
+                  <small>Low (&lt;2000)</small>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    margin-top: 3px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 20px;
+                      height: 20px;
+                      background: #fbc02d;
+                      border-radius: 3px;
+                    "
+                  ></div>
+                  <small>Medium (2000-6000)</small>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    margin-top: 3px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 20px;
+                      height: 20px;
+                      background: #f57c00;
+                      border-radius: 3px;
+                    "
+                  ></div>
+                  <small>High (6000-10000)</small>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    margin-top: 3px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 20px;
+                      height: 20px;
+                      background: #d32f2f;
+                      border-radius: 3px;
+                    "
+                  ></div>
+                  <small>Very High (&gt;10000)</small>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="info-box" style="margin-top: 15px;">
-        <!-- <strong>📊 Data Integration:</strong><br> -->
-        <!-- <small>✅ 522 water supply network points loaded<br> -->
-        <!-- ✅ 21 wards with population data<br> -->
-        <!-- ✅ Amazing animations activated<br> -->
-        <!-- To load additional GIS data:<br>
+          <div class="info-box" style="margin-top: 15px">
+            <!-- <strong>📊 Data Integration:</strong><br> -->
+            <!-- <small>✅ 522 water supply network points loaded<br> -->
+            <!-- ✅ 21 wards with population data<br> -->
+            <!-- ✅ Amazing animations activated<br> -->
+            <!-- To load additional GIS data:<br>
         • GeoJSON files<br>
         • WMS/WFS services<br>
         • Shapefile conversions</small> -->
-      </div>
-    </div>
-
-    <!-- CENTER PANEL: Map -->
-    <div class="map-container">
-      <div id="map"></div>
-    </div>
-
-    <!-- RIGHT PANEL: Analytics -->
-    <div class="panel right-panel">
-      <div class="section-title">📊 Analytics Dashboard</div>
-      
-      <div class="stats-grid">
-        <div class="stat-card danger">
-          <span class="value">12,450</span>
-          <span class="label">Population at High Risk</span>
+          </div>
         </div>
-        <div class="stat-card warning">
-          <span class="value">28,320</span>
-          <span class="label">Medium Risk</span>
+
+        <!-- CENTER PANEL: Map -->
+        <div class="map-container">
+          <div id="map"></div>
         </div>
-        <!-- <div class="stat-card">
+
+        <!-- RIGHT PANEL: Analytics -->
+        <div class="panel right-panel">
+          <div class="section-title">📊 Analytics Dashboard</div>
+
+          <div class="stats-grid">
+            <div class="stat-card danger">
+              <span class="value">12,450</span>
+              <span class="label">Population at High Risk</span>
+            </div>
+            <div class="stat-card warning">
+              <span class="value">28,320</span>
+              <span class="label">Medium Risk</span>
+            </div>
+            <!-- <div class="stat-card">
           <span class="value">522</span>
           <span class="label">Supply Network Points</span>
         </div>
@@ -775,10 +448,9 @@ body {
           <span class="value">1,847</span>
           <span class="label">Active Clients</span>
         </div> -->
-      </div>
+          </div>
 
-
-      <!-- <div class="stats-grid">
+          <!-- <div class="stats-grid">
         <div class="stat-card danger" id="highRiskCard">
           <span class="value">Loading...</span>
           <span class="label">Population at High Risk</span>
@@ -789,48 +461,50 @@ body {
         </div>
       </div> -->
 
-      <div class="section-title" style="margin-top: 20px;">🏘️ Ward Analysis</div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Ward</th>
-            <th>Pop.</th>
-            <th>Risk</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Nyamagana</td>
-            <td>45,230</td>
-            <td><span class="badge badge-danger">High</span></td>
-          </tr>
-          <tr>
-            <td>Ilemela</td>
-            <td>38,150</td>
-            <td><span class="badge badge-warning">Medium</span></td>
-          </tr>
-          <tr>
-            <td>Pamba</td>
-            <td>32,890</td>
-            <td><span class="badge badge-danger">High</span></td>
-          </tr>
-          <tr>
-            <td>Mirongo</td>
-            <td>28,420</td>
-            <td><span class="badge badge-danger">High</span></td>
-          </tr>
-          <tr>
-            <td>Igoma</td>
-            <td>25,670</td>
-            <td><span class="badge badge-warning">Medium</span></td>
-          </tr>
-        </tbody>
-      </table>
+          <div class="section-title" style="margin-top: 20px">
+            🏘️ Ward Analysis
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Ward</th>
+                <th>Pop.</th>
+                <th>Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Nyamagana</td>
+                <td>45,230</td>
+                <td><span class="badge badge-danger">High</span></td>
+              </tr>
+              <tr>
+                <td>Ilemela</td>
+                <td>38,150</td>
+                <td><span class="badge badge-warning">Medium</span></td>
+              </tr>
+              <tr>
+                <td>Pamba</td>
+                <td>32,890</td>
+                <td><span class="badge badge-danger">High</span></td>
+              </tr>
+              <tr>
+                <td>Mirongo</td>
+                <td>28,420</td>
+                <td><span class="badge badge-danger">High</span></td>
+              </tr>
+              <tr>
+                <td>Igoma</td>
+                <td>25,670</td>
+                <td><span class="badge badge-warning">Medium</span></td>
+              </tr>
+            </tbody>
+          </table>
 
-      <!-- //-----------------------------------------------------------------------------
+          <!-- //-----------------------------------------------------------------------------
       // WARD ANALYSIS TABLE & CHART
       //----------------------------------------------------------------------------- -->
-      <!-- <div class="section-title" style="margin-top: 20px;">🏘️ Ward Analysis</div>
+          <!-- <div class="section-title" style="margin-top: 20px;">🏘️ Ward Analysis</div>
       <table class="data-table">
         <thead>
           <tr>
@@ -846,325 +520,363 @@ body {
         </tbody>
       </table> -->
 
-      <!-- <div class="chart-container">
+          <!-- <div class="chart-container">
         <canvas id="riskChart" style="max-height: 200px;"></canvas>
       </div> -->
 
-      <div class="chart-container">
-        <canvas id="riskChart" style="max-height: 200px;"></canvas>
-      </div>
+          <div class="chart-container">
+            <canvas id="riskChart" style="max-height: 200px"></canvas>
+          </div>
 
-      <div class="section-title" style="margin-top: 20px;">🌧️ Rainfall Analysis</div>
-      <div class="chart-container">
-        <canvas id="rainfallChart" style="max-height: 250px;"></canvas>
-      </div>
+          <div class="section-title" style="margin-top: 20px">
+            🌧️ Rainfall Analysis
+          </div>
+          <div class="chart-container">
+            <canvas id="rainfallChart" style="max-height: 250px"></canvas>
+          </div>
 
-      <div class="section-title" style="margin-top: 20px;">🏥 Critical Infrastructure</div>
-      <div class="info-box danger">
-        <strong>⚠️ High Risk Facilities:</strong><br>
-        • 12 Schools<br>
-        • 3 Hospitals<br>
-        <!-- • 8 Water Treatment Plants -->
-      </div>
+          <div class="section-title" style="margin-top: 20px">
+            🏥 Critical Infrastructure
+          </div>
+          <div class="info-box danger">
+            <strong>⚠️ High Risk Facilities:</strong><br />
+            • 12 Schools<br />
+            • 3 Hospitals<br />
+            <!-- • 8 Water Treatment Plants -->
+          </div>
 
-      <!-- <button class="btn btn-primary">📥 Export Flood Report</button>
+          <!-- <button class="btn btn-primary">📥 Export Flood Report</button>
       <button class="btn btn-success">📊 Generate Analytics</button>
       <button class="btn btn-warning">⚠️ Send Alerts</button> -->
 
-      <button class="btn btn-primary"
-              onclick="showAlert('Flood report exported successfully!')">
-        📥 Export Flood Report
-      </button>
+          <button
+            class="btn btn-primary"
+            onclick="showAlert('Flood report exported successfully!')"
+          >
+            📥 Export Flood Report
+          </button>
 
-      <button class="btn btn-success"
-              onclick="showAlert('Analytics generated successfully!')">
-        📊 Generate Analytics
-      </button>
+          <button
+            class="btn btn-success"
+            onclick="showAlert('Analytics generated successfully!')"
+          >
+            📊 Generate Analytics
+          </button>
 
-      <!-- <button class="btn btn-warning"
+          <!-- <button class="btn btn-warning"
               onclick="showAlert('⚠️ Alerts sent successfully!')">
         ⚠️ Send Alerts
       </button> -->
 
-      <script>
-        function showAlert(message) {
-          alert(message);
-        }
-      </script>
+          <script>
+            function showAlert(message) {
+              alert(message);
+            }
+          </script>
 
-      <div class="section-title" style="margin-top: 20px;">📈 Data Sources</div>
-      <div class="legend-item">
-        <div class="legend-color" style="background: #1976d2;"></div>
-        <span>NBS Tanzania</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background: #43a047;"></div>
-        <span>OpenStreetMap</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background: #fb8c00;"></div>
-        <span>HydroSHEDS</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background: #e53935;"></div>
-        <span>NASA SRTM</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background: #2196F3;"></div>
-        <span>LVBWB Network</span>
+          <div class="section-title" style="margin-top: 20px">
+            📈 Data Sources
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #1976d2"></div>
+            <span>NBS Tanzania</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #43a047"></div>
+            <span>OpenStreetMap</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #fb8c00"></div>
+            <span>HydroSHEDS</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #e53935"></div>
+            <span>NASA SRTM</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #2196f3"></div>
+            <span>LVBWB Network</span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<script>
-// Initialize map centered on Mwanza
-const map = L.map('map').setView([-2.5164, 32.9175], 12);
+    <script>
+      // Initialize map centered on Mwanza
+      const map = L.map("map").setView([-2.5164, 32.9175], 12);
 
-// Base layers
-const baseLayers = {
-  'OpenStreetMap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 19
-  }),
-  'Satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: '© Esri',
-    maxZoom: 18
-  }),
-  'Terrain': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenTopoMap',
-    maxZoom: 17
-  })
-};
+      // Base layers
+      const baseLayers = {
+        OpenStreetMap: L.tileLayer(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            attribution: "© OpenStreetMap contributors",
+            maxZoom: 19,
+          },
+        ),
+        Satellite: L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution: "© Esri",
+            maxZoom: 18,
+          },
+        ),
+        Terrain: L.tileLayer(
+          "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          {
+            attribution: "© OpenTopoMap",
+            maxZoom: 17,
+          },
+        ),
+      };
 
-baseLayers['OpenStreetMap'].addTo(map);
-L.control.layers(baseLayers).addTo(map);
+      baseLayers["OpenStreetMap"].addTo(map);
+      L.control.layers(baseLayers).addTo(map);
 
-// Layer groups storage
-const layerGroups = {
-  admin: L.layerGroup(),
-  rivers: L.layerGroup(),
-  dem: L.layerGroup(),
-  lulc: L.layerGroup(),
-  flood: L.layerGroup(),
-  infrastructure: L.layerGroup(),
-  supply: L.layerGroup(),
-  clients: L.layerGroup(),
-  population: L.layerGroup()
-};
+      // Layer groups storage
+      const layerGroups = {
+        admin: L.layerGroup(),
+        rivers: L.layerGroup(),
+        dem: L.layerGroup(),
+        lulc: L.layerGroup(),
+        flood: L.layerGroup(),
+        infrastructure: L.layerGroup(),
+        supply: L.layerGroup(),
+        clients: L.layerGroup(),
+        population: L.layerGroup(),
+      };
 
-// Add all layer groups to map
-Object.values(layerGroups).forEach(layer => map.addLayer(layer));
+      // Add all layer groups to map
+      Object.values(layerGroups).forEach((layer) => map.addLayer(layer));
 
-// Store elevation zones globally for range filtering
-let elevationZones = [];
+      // Store elevation zones globally for range filtering
+      let elevationZones = [];
 
-// // ========================================
-// // ADMINISTRATIVE BOUNDARIES (Perfect Circles)
-// // ========================================
-// const mwanzaWards = [
-//   { name: 'Nyamagana', center: [-2.5175, 32.9125], population: 45230, risk: 'High', radius: 1700 },
-//   { name: 'Ilemela', center: [-2.4925, 32.9125], population: 38150, risk: 'Medium', radius: 1500 },
-//   { name: 'Pamba', center: [-2.5425, 32.9125], population: 32890, risk: 'High', radius: 1400 },
-//   { name: 'Mirongo', center: [-2.5175, 32.9375], population: 28420, risk: 'High', radius: 1300 }
-// ];
+      // // ========================================
+      // // ADMINISTRATIVE BOUNDARIES (Perfect Circles)
+      // // ========================================
+      // const mwanzaWards = [
+      //   { name: 'Nyamagana', center: [-2.5175, 32.9125], population: 45230, risk: 'High', radius: 1700 },
+      //   { name: 'Ilemela', center: [-2.4925, 32.9125], population: 38150, risk: 'Medium', radius: 1500 },
+      //   { name: 'Pamba', center: [-2.5425, 32.9125], population: 32890, risk: 'High', radius: 1400 },
+      //   { name: 'Mirongo', center: [-2.5175, 32.9375], population: 28420, risk: 'High', radius: 1300 }
+      // ];
 
-// mwanzaWards.forEach(ward => {
-//   const circle = L.circle(ward.center, {
-//     color: ward.risk === 'High' ? '#e53935' : '#fb8c00',
-//     fillColor: ward.risk === 'High' ? '#e53935' : '#fb8c00',
-//     fillOpacity: 0.15,
-//     weight: 2,
-//     radius: ward.radius,
-//     className: 'fade-in'
-//   }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>🏛️ Ward: ${ward.name}</h4>
-//       <p><strong>Population:</strong> ${ward.population.toLocaleString()}</p>
-//       <p><strong>Flood Risk:</strong> <span class="badge badge-${ward.risk === 'High' ? 'danger' : 'warning'}">${ward.risk}</span></p>
-//       <p><strong>Data Source:</strong> Tanzania NBS</p>
-//     </div>
-//   `);
-  
-//   // Add fade in animation
-//   setTimeout(() => {
-//     circle.addTo(layerGroups.admin);
-//   }, 100);
-// });
+      // mwanzaWards.forEach(ward => {
+      //   const circle = L.circle(ward.center, {
+      //     color: ward.risk === 'High' ? '#e53935' : '#fb8c00',
+      //     fillColor: ward.risk === 'High' ? '#e53935' : '#fb8c00',
+      //     fillOpacity: 0.15,
+      //     weight: 2,
+      //     radius: ward.radius,
+      //     className: 'fade-in'
+      //   }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>🏛️ Ward: ${ward.name}</h4>
+      //       <p><strong>Population:</strong> ${ward.population.toLocaleString()}</p>
+      //       <p><strong>Flood Risk:</strong> <span class="badge badge-${ward.risk === 'High' ? 'danger' : 'warning'}">${ward.risk}</span></p>
+      //       <p><strong>Data Source:</strong> Tanzania NBS</p>
+      //     </div>
+      //   `);
 
-// ========================================
-// ADMINISTRATIVE BOUNDARIES (Perfect Circles) - FROM GEOJSON
-// ========================================
-fetch('data/wards.geojson')
-  .then(response => response.json())
-  .then(data => {
-    data.features.forEach((feature, index) => {
-      const props = feature.properties;
-      const coords = feature.geometry.coordinates;
-      
-      const circle = L.circle([coords[1], coords[0]], {
-        color: props.risk === 'High' ? '#e53935' : '#fb8c00',
-        fillColor: props.risk === 'High' ? '#e53935' : '#fb8c00',
-        fillOpacity: 0.15,
-        weight: 2,
-        radius: props.radius,
-        className: 'fade-in'
-      }).bindPopup(`
+      //   // Add fade in animation
+      //   setTimeout(() => {
+      //     circle.addTo(layerGroups.admin);
+      //   }, 100);
+      // });
+
+      // ========================================
+      // ADMINISTRATIVE BOUNDARIES (Perfect Circles) - FROM GEOJSON
+      // ========================================
+      fetch("data/wards.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          data.features.forEach((feature, index) => {
+            const props = feature.properties;
+            const coords = feature.geometry.coordinates;
+
+            const circle = L.circle([coords[1], coords[0]], {
+              color: props.risk === "High" ? "#e53935" : "#fb8c00",
+              fillColor: props.risk === "High" ? "#e53935" : "#fb8c00",
+              fillOpacity: 0.15,
+              weight: 2,
+              radius: props.radius,
+              className: "fade-in",
+            }).bindPopup(`
         <div class="popup-content">
           <h4>🏛️ Ward: ${props.name}</h4>
           <p><strong>Population:</strong> ${props.population.toLocaleString()}</p>
-          <p><strong>Flood Risk:</strong> <span class="badge badge-${props.risk === 'High' ? 'danger' : 'warning'}">${props.risk}</span></p>
+          <p><strong>Flood Risk:</strong> <span class="badge badge-${props.risk === "High" ? "danger" : "warning"}">${props.risk}</span></p>
           <p><strong>Data Source:</strong> Tanzania NBS</p>
         </div>
       `);
-      
-      setTimeout(() => {
-        circle.addTo(layerGroups.admin);
-      }, 100 + index * 50);
-    });
-  })
-  .catch(error => console.error('Error loading wards:', error));
 
+            setTimeout(
+              () => {
+                circle.addTo(layerGroups.admin);
+              },
+              100 + index * 50,
+            );
+          });
+        })
+        .catch((error) => console.error("Error loading wards:", error));
 
-// // ========================================
-// // POPULATION DENSITY LAYER (Breathing Circles)
-// // ========================================
-// const populationData = [
-//   { ward: 'Mikuyuni', lat: -2.550477699, lng: 32.90915538, population: 18780, density: 9503 },
-//   { ward: 'Igogo', lat: -2.533852115, lng: 32.90772912, population: 27303, density: 12086 },
-//   { ward: 'Pamba', lat: -2.525155557, lng: 32.90721542, population: 23519, density: 10938 },
-//   { ward: 'Nyamagana', lat: -2.510692591, lng: 32.86678536, population: 5807, density: 2152 },
-//   { ward: 'Mirongo', lat: -2.514267907, lng: 32.90344757, population: 2925, density: 7858 },
-//   { ward: 'Isamilo', lat: -2.507003494, lng: 32.90749784, population: 24220, density: 7865 },
-//   { ward: 'Mbugani', lat: -2.518173371, lng: 32.91775296, population: 39041, density: 7803 },
-//   { ward: 'Mahina', lat: -2.55551661, lng: 32.94687076, population: 59437, density: 2810 },
-//   { ward: 'Igoma', lat: -2.583832556, lng: 32.99496485, population: 56596, density: 1446 },
-//   { ward: 'Buhongwa', lat: -2.616113155, lng: 32.96496876, population: 26681, density: 559 },
-//   { ward: 'Mkolani', lat: -2.613950357, lng: 32.89698035, population: 32199, density: 798 },
-//   { ward: 'Butimba', lat: -2.552722035, lng: 32.88336391, population: 46944, density: 2511 },
-//   { ward: 'Buswelu', lat: -2.524930946, lng: 32.99592622, population: 22897, density: 548 },
-//   { ward: 'Nyakato', lat: -2.515575176, lng: 32.94401656, population: 82348, density: 5348 },
-//   { ward: 'Nyamanoro', lat: -2.489071423, lng: 32.91291517, population: 51456, density: 12802 },
-//   { ward: 'Kirumba', lat: -2.495017951, lng: 32.8846357, population: 28103, density: 6266 },
-//   { ward: 'Kitangiri', lat: -2.485388617, lng: 32.89197463, population: 20802, density: 5619 },
-//   { ward: 'Pasiansi', lat: -2.477490785, lng: 32.90391388, population: 35723, density: 4288 },
-//   { ward: 'Ilemela', lat: -2.473422645, lng: 32.9617452, population: 43244, density: 843 },
-//   { ward: 'Bugogwa', lat: -2.36299816, lng: 32.92159712, population: 37312, density: 510 },
-//   { ward: 'Sangabuye', lat: -2.257281343, lng: 33.04436413, population: 21116, density: 383 }
-// ];
+      // // ========================================
+      // // POPULATION DENSITY LAYER (Breathing Circles)
+      // // ========================================
+      // const populationData = [
+      //   { ward: 'Mikuyuni', lat: -2.550477699, lng: 32.90915538, population: 18780, density: 9503 },
+      //   { ward: 'Igogo', lat: -2.533852115, lng: 32.90772912, population: 27303, density: 12086 },
+      //   { ward: 'Pamba', lat: -2.525155557, lng: 32.90721542, population: 23519, density: 10938 },
+      //   { ward: 'Nyamagana', lat: -2.510692591, lng: 32.86678536, population: 5807, density: 2152 },
+      //   { ward: 'Mirongo', lat: -2.514267907, lng: 32.90344757, population: 2925, density: 7858 },
+      //   { ward: 'Isamilo', lat: -2.507003494, lng: 32.90749784, population: 24220, density: 7865 },
+      //   { ward: 'Mbugani', lat: -2.518173371, lng: 32.91775296, population: 39041, density: 7803 },
+      //   { ward: 'Mahina', lat: -2.55551661, lng: 32.94687076, population: 59437, density: 2810 },
+      //   { ward: 'Igoma', lat: -2.583832556, lng: 32.99496485, population: 56596, density: 1446 },
+      //   { ward: 'Buhongwa', lat: -2.616113155, lng: 32.96496876, population: 26681, density: 559 },
+      //   { ward: 'Mkolani', lat: -2.613950357, lng: 32.89698035, population: 32199, density: 798 },
+      //   { ward: 'Butimba', lat: -2.552722035, lng: 32.88336391, population: 46944, density: 2511 },
+      //   { ward: 'Buswelu', lat: -2.524930946, lng: 32.99592622, population: 22897, density: 548 },
+      //   { ward: 'Nyakato', lat: -2.515575176, lng: 32.94401656, population: 82348, density: 5348 },
+      //   { ward: 'Nyamanoro', lat: -2.489071423, lng: 32.91291517, population: 51456, density: 12802 },
+      //   { ward: 'Kirumba', lat: -2.495017951, lng: 32.8846357, population: 28103, density: 6266 },
+      //   { ward: 'Kitangiri', lat: -2.485388617, lng: 32.89197463, population: 20802, density: 5619 },
+      //   { ward: 'Pasiansi', lat: -2.477490785, lng: 32.90391388, population: 35723, density: 4288 },
+      //   { ward: 'Ilemela', lat: -2.473422645, lng: 32.9617452, population: 43244, density: 843 },
+      //   { ward: 'Bugogwa', lat: -2.36299816, lng: 32.92159712, population: 37312, density: 510 },
+      //   { ward: 'Sangabuye', lat: -2.257281343, lng: 33.04436413, population: 21116, density: 383 }
+      // ];
 
-// function getPopulationColor(density) {
-//   if (density > 10000) return '#d32f2f';
-//   if (density > 6000) return '#f57c00';
-//   if (density > 2000) return '#fbc02d';
-//   return '#2e7d32';
-// }
+      // function getPopulationColor(density) {
+      //   if (density > 10000) return '#d32f2f';
+      //   if (density > 6000) return '#f57c00';
+      //   if (density > 2000) return '#fbc02d';
+      //   return '#2e7d32';
+      // }
 
-// populationData.forEach((ward, index) => {
-//   const color = getPopulationColor(ward.density);
-//   const radius = Math.sqrt(ward.density) * 8;
-  
-//   const circle = L.circle([ward.lat, ward.lng], {
-//     color: color,
-//     fillColor: color,
-//     fillOpacity: 0.5,
-//     weight: 2,
-//     radius: radius
-//   }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>👨‍👩‍👧‍👦 ${ward.ward} Ward</h4>
-//       <p><strong>Total Population:</strong> ${ward.population.toLocaleString()}</p>
-//       <p><strong>Population Density:</strong> ${ward.density.toLocaleString()} per km²</p>
-//       <p><strong>Density Level:</strong> <span class="badge badge-${ward.density > 6000 ? 'danger' : ward.density > 2000 ? 'warning' : 'success'}">${ward.density > 10000 ? 'Very High' : ward.density > 6000 ? 'High' : ward.density > 2000 ? 'Medium' : 'Low'}</span></p>
-//       <p><strong>Data Source:</strong> Tanzania NBS Census</p>
-//     </div>
-//   `);
-  
-//   // Add breathing animation with delay
-//   setTimeout(() => {
-//     const elem = circle.addTo(layerGroups.population);
-//     const path = elem.getElement();
-//     if (path) {
-//       path.style.animation = 'breathe 3s ease-in-out infinite';
-//       path.style.animationDelay = `${index * 0.1}s`;
-//     }
-//   }, 200 + index * 50);
-// });
+      // populationData.forEach((ward, index) => {
+      //   const color = getPopulationColor(ward.density);
+      //   const radius = Math.sqrt(ward.density) * 8;
 
+      //   const circle = L.circle([ward.lat, ward.lng], {
+      //     color: color,
+      //     fillColor: color,
+      //     fillOpacity: 0.5,
+      //     weight: 2,
+      //     radius: radius
+      //   }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>👨‍👩‍👧‍👦 ${ward.ward} Ward</h4>
+      //       <p><strong>Total Population:</strong> ${ward.population.toLocaleString()}</p>
+      //       <p><strong>Population Density:</strong> ${ward.density.toLocaleString()} per km²</p>
+      //       <p><strong>Density Level:</strong> <span class="badge badge-${ward.density > 6000 ? 'danger' : ward.density > 2000 ? 'warning' : 'success'}">${ward.density > 10000 ? 'Very High' : ward.density > 6000 ? 'High' : ward.density > 2000 ? 'Medium' : 'Low'}</span></p>
+      //       <p><strong>Data Source:</strong> Tanzania NBS Census</p>
+      //     </div>
+      //   `);
 
-// ========================================
-// POPULATION DENSITY LAYER (Breathing Circles) - FROM GEOJSON
-// ========================================
-function getPopulationColor(density) {
-  if (density > 10000) return '#d32f2f';
-  if (density > 6000) return '#f57c00';
-  if (density > 2000) return '#fbc02d';
-  return '#2e7d32';
-}
+      //   // Add breathing animation with delay
+      //   setTimeout(() => {
+      //     const elem = circle.addTo(layerGroups.population);
+      //     const path = elem.getElement();
+      //     if (path) {
+      //       path.style.animation = 'breathe 3s ease-in-out infinite';
+      //       path.style.animationDelay = `${index * 0.1}s`;
+      //     }
+      //   }, 200 + index * 50);
+      // });
 
-fetch('data/population.geojson')
-  .then(response => response.json())
-  .then(data => {
-    data.features.forEach((feature, index) => {
-      const props = feature.properties;
-      const coords = feature.geometry.coordinates;
-      
-      const color = getPopulationColor(props.density);
-      const radius = Math.sqrt(props.density) * 8;
-      
-      const circle = L.circle([coords[1], coords[0]], {
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.5,
-        weight: 2,
-        radius: radius
-      }).bindPopup(`
+      // ========================================
+      // POPULATION DENSITY LAYER (Breathing Circles) - FROM GEOJSON
+      // ========================================
+      function getPopulationColor(density) {
+        if (density > 10000) return "#d32f2f";
+        if (density > 6000) return "#f57c00";
+        if (density > 2000) return "#fbc02d";
+        return "#2e7d32";
+      }
+
+      fetch("data/population.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          data.features.forEach((feature, index) => {
+            const props = feature.properties;
+            const coords = feature.geometry.coordinates;
+
+            const color = getPopulationColor(props.density);
+            const radius = Math.sqrt(props.density) * 8;
+
+            const circle = L.circle([coords[1], coords[0]], {
+              color: color,
+              fillColor: color,
+              fillOpacity: 0.5,
+              weight: 2,
+              radius: radius,
+            }).bindPopup(`
         <div class="popup-content">
           <h4>👨‍👩‍👧‍👦 ${props.ward} Ward</h4>
           <p><strong>Total Population:</strong> ${props.population.toLocaleString()}</p>
           <p><strong>Population Density:</strong> ${props.density.toLocaleString()} per km²</p>
-          <p><strong>Density Level:</strong> <span class="badge badge-${props.density > 6000 ? 'danger' : props.density > 2000 ? 'warning' : 'success'}">${props.density > 10000 ? 'Very High' : props.density > 6000 ? 'High' : props.density > 2000 ? 'Medium' : 'Low'}</span></p>
+          <p><strong>Density Level:</strong> <span class="badge badge-${props.density > 6000 ? "danger" : props.density > 2000 ? "warning" : "success"}">${props.density > 10000 ? "Very High" : props.density > 6000 ? "High" : props.density > 2000 ? "Medium" : "Low"}</span></p>
           <p><strong>Data Source:</strong> Tanzania NBS Census</p>
         </div>
       `);
-      
-      setTimeout(() => {
-        const elem = circle.addTo(layerGroups.population);
-        const path = elem.getElement();
-        if (path) {
-          path.style.animation = 'breathe 3s ease-in-out infinite';
-          path.style.animationDelay = `${index * 0.1}s`;
-        }
-      }, 200 + index * 50);
-    });
-  })
-  .catch(error => console.error('Error loading population data:', error));
 
+            setTimeout(
+              () => {
+                const elem = circle.addTo(layerGroups.population);
+                const path = elem.getElement();
+                if (path) {
+                  path.style.animation = "breathe 3s ease-in-out infinite";
+                  path.style.animationDelay = `${index * 0.1}s`;
+                }
+              },
+              200 + index * 50,
+            );
+          });
+        })
+        .catch((error) =>
+          console.error("Error loading population data:", error),
+        );
 
+      // ========================================
+      // RIVER NETWORK with AMAZING FLOW ANIMATION
+      // ========================================
+      const mirongoRiver = [
+        [-2.45, 32.88],
+        [-2.47, 32.895],
+        [-2.49, 32.91],
+        [-2.51, 32.925],
+        [-2.53, 32.94],
+        [-2.55, 32.955],
+      ];
 
+      const tributaries = [
+        [
+          [-2.46, 32.89],
+          [-2.48, 32.905],
+          [-2.5, 32.92],
+        ],
+        [
+          [-2.5, 32.9],
+          [-2.515, 32.915],
+          [-2.53, 32.93],
+        ],
+        [
+          [-2.52, 32.91],
+          [-2.535, 32.925],
+          [-2.55, 32.94],
+        ],
+      ];
 
-// ========================================
-// RIVER NETWORK with AMAZING FLOW ANIMATION
-// ========================================
-const mirongoRiver = [
-  [-2.450, 32.880], [-2.470, 32.895], [-2.490, 32.910], 
-  [-2.510, 32.925], [-2.530, 32.940], [-2.550, 32.955]
-];
-
-const tributaries = [
-  [[-2.460, 32.890], [-2.480, 32.905], [-2.500, 32.920]],
-  [[-2.500, 32.900], [-2.515, 32.915], [-2.530, 32.930]],
-  [[-2.520, 32.910], [-2.535, 32.925], [-2.550, 32.940]]
-];
-
-// Main river with flowing water animation
-const riverLine = L.polyline(mirongoRiver, {
-  color: '#1976d2',
-  weight: 5,
-  opacity: 0.8,
-  dashArray: '20, 10',
-  lineCap: 'round'
-}).bindPopup(`
+      // Main river with flowing water animation
+      const riverLine = L.polyline(mirongoRiver, {
+        color: "#1976d2",
+        weight: 5,
+        opacity: 0.8,
+        dashArray: "20, 10",
+        lineCap: "round",
+      }).bindPopup(`
   <div class="popup-content">
     <h4>🌊 Mirongo River</h4>
     <p><strong>Length:</strong> ~15 km</p>
@@ -1174,448 +886,448 @@ const riverLine = L.polyline(mirongoRiver, {
   </div>
 `);
 
-setTimeout(() => {
-  riverLine.addTo(layerGroups.rivers);
-  const riverPath = riverLine.getElement();
-  if (riverPath) {
-    riverPath.style.strokeDasharray = '20, 10';
-    riverPath.style.animation = 'flowRiver 3s linear infinite';
-  }
-}, 300);
+      setTimeout(() => {
+        riverLine.addTo(layerGroups.rivers);
+        const riverPath = riverLine.getElement();
+        if (riverPath) {
+          riverPath.style.strokeDasharray = "20, 10";
+          riverPath.style.animation = "flowRiver 3s linear infinite";
+        }
+      }, 300);
 
-// Tributaries with flow animation
-tributaries.forEach((trib, i) => {
-  const tribLine = L.polyline(trib, {
-    color: '#42a5f5',
-    weight: 3,
-    opacity: 0.7,
-    dashArray: '15, 8',
-    lineCap: 'round'
-  }).bindPopup(`
+      // Tributaries with flow animation
+      tributaries.forEach((trib, i) => {
+        const tribLine = L.polyline(trib, {
+          color: "#42a5f5",
+          weight: 3,
+          opacity: 0.7,
+          dashArray: "15, 8",
+          lineCap: "round",
+        }).bindPopup(`
     <div class="popup-content">
       <h4>🌊 Tributary ${i + 1}</h4>
       <p><strong>Type:</strong> Seasonal stream</p>
       <p><strong>Data Source:</strong> HydroSHEDS</p>
     </div>
   `);
-  
-  setTimeout(() => {
-    tribLine.addTo(layerGroups.rivers);
-    const tribPath = tribLine.getElement();
-    if (tribPath) {
-      tribPath.style.strokeDasharray = '15, 8';
-      tribPath.style.animation = 'flowRiver 2.5s linear infinite';
-      tribPath.style.animationDelay = `${i * 0.3}s`;
-    }
-  }, 400 + i * 100);
-});
 
+        setTimeout(
+          () => {
+            tribLine.addTo(layerGroups.rivers);
+            const tribPath = tribLine.getElement();
+            if (tribPath) {
+              tribPath.style.strokeDasharray = "15, 8";
+              tribPath.style.animation = "flowRiver 2.5s linear infinite";
+              tribPath.style.animationDelay = `${i * 0.3}s`;
+            }
+          },
+          400 + i * 100,
+        );
+      });
 
-// // ========================================
-// // RIVER NETWORK with AMAZING FLOW ANIMATION - FROM GEOJSON
-// // ========================================
-// fetch('data/rivers.geojson')
-//   .then(response => response.json())
-//   .then(data => {
-//     data.features.forEach((feature, index) => {
-//       const props = feature.properties;
-//       const coords = feature.geometry.coordinates;
-//       const isMainRiver = props.type === 'main';
-      
-//       const riverLine = L.polyline(coords.map(c => [c[1], c[0]]), {
-//         color: isMainRiver ? '#1976d2' : '#42a5f5',
-//         weight: isMainRiver ? 5 : 3,
-//         opacity: isMainRiver ? 0.8 : 0.7,
-//         dashArray: isMainRiver ? '20, 10' : '15, 8',
-//         lineCap: 'round'
-//       }).bindPopup(`
-//         <div class="popup-content">
-//           <h4>🌊 ${props.name}</h4>
-//           <p><strong>Length:</strong> ${props.length || 'N/A'}</p>
-//           ${props.watershed ? `<p><strong>Watershed Area:</strong> ${props.watershed}</p>` : ''}
-//           ${props.flow_direction ? `<p><strong>Flow Direction:</strong> ${props.flow_direction}</p>` : ''}
-//           <p><strong>Data Source:</strong> HydroSHEDS</p>
-//         </div>
-//       `);
-      
-//       setTimeout(() => {
-//         riverLine.addTo(layerGroups.rivers);
-//         const riverPath = riverLine.getElement();
-//         if (riverPath) {
-//           riverPath.style.strokeDasharray = isMainRiver ? '20, 10' : '15, 8';
-//           riverPath.style.animation = `flowRiver ${isMainRiver ? 3 : 2.5}s linear infinite`;
-//           if (!isMainRiver) {
-//             riverPath.style.animationDelay = `${index * 0.3}s`;
-//           }
-//         }
-//       }, 300 + index * 100);
-//     });
-//   })
-//   .catch(error => console.error('Error loading rivers:', error));
+      // // ========================================
+      // // RIVER NETWORK with AMAZING FLOW ANIMATION - FROM GEOJSON
+      // // ========================================
+      // fetch('data/rivers.geojson')
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     data.features.forEach((feature, index) => {
+      //       const props = feature.properties;
+      //       const coords = feature.geometry.coordinates;
+      //       const isMainRiver = props.type === 'main';
 
+      //       const riverLine = L.polyline(coords.map(c => [c[1], c[0]]), {
+      //         color: isMainRiver ? '#1976d2' : '#42a5f5',
+      //         weight: isMainRiver ? 5 : 3,
+      //         opacity: isMainRiver ? 0.8 : 0.7,
+      //         dashArray: isMainRiver ? '20, 10' : '15, 8',
+      //         lineCap: 'round'
+      //       }).bindPopup(`
+      //         <div class="popup-content">
+      //           <h4>🌊 ${props.name}</h4>
+      //           <p><strong>Length:</strong> ${props.length || 'N/A'}</p>
+      //           ${props.watershed ? `<p><strong>Watershed Area:</strong> ${props.watershed}</p>` : ''}
+      //           ${props.flow_direction ? `<p><strong>Flow Direction:</strong> ${props.flow_direction}</p>` : ''}
+      //           <p><strong>Data Source:</strong> HydroSHEDS</p>
+      //         </div>
+      //       `);
 
-// // ========================================
-// // DIGITAL ELEVATION MODEL (Glowing Circles)
-// // ========================================
-// const elevationData = [
-//   { center: [-2.515, 32.920], elevation: '0-50m', min: 0, max: 50, color: '#1565c0', radius: 4000 },
-//   { center: [-2.510, 32.920], elevation: '50-100m', min: 50, max: 100, color: '#1976d2', radius: 2500 },
-//   { center: [-2.510, 32.920], elevation: '100-150m', min: 100, max: 150, color: '#42a5f5', radius: 1200 },
-//   { center: [-2.5075, 32.920], elevation: '150-200m', min: 150, max: 200, color: '#90caf9', radius: 600 }
-// ];
+      //       setTimeout(() => {
+      //         riverLine.addTo(layerGroups.rivers);
+      //         const riverPath = riverLine.getElement();
+      //         if (riverPath) {
+      //           riverPath.style.strokeDasharray = isMainRiver ? '20, 10' : '15, 8';
+      //           riverPath.style.animation = `flowRiver ${isMainRiver ? 3 : 2.5}s linear infinite`;
+      //           if (!isMainRiver) {
+      //             riverPath.style.animationDelay = `${index * 0.3}s`;
+      //           }
+      //         }
+      //       }, 300 + index * 100);
+      //     });
+      //   })
+      //   .catch(error => console.error('Error loading rivers:', error));
 
-// elevationData.forEach((zone, index) => {
-//   const circle = L.circle(zone.center, {
-//     color: zone.color,
-//     fillColor: zone.color,
-//     fillOpacity: 0.3,
-//     weight: 1,
-//     radius: zone.radius
-//   }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>⛰️ Elevation Zone</h4>
-//       <p><strong>Range:</strong> ${zone.elevation}</p>
-//       <p><strong>Data Source:</strong> NASA SRTM 30m</p>
-//       <p><strong>Resolution:</strong> 30m</p>
-//     </div>
-//   `);
-  
-//   setTimeout(() => {
-//     circle.addTo(layerGroups.dem);
-//     const elem = circle.getElement();
-//     if (elem) {
-//       elem.style.animation = 'glow 4s ease-in-out infinite';
-//       elem.style.animationDelay = `${index * 0.5}s`;
-//     }
-//   }, 500 + index * 150);
-  
-//   elevationZones.push({ layer: circle, min: zone.min, max: zone.max });
-// });
+      // // ========================================
+      // // DIGITAL ELEVATION MODEL (Glowing Circles)
+      // // ========================================
+      // const elevationData = [
+      //   { center: [-2.515, 32.920], elevation: '0-50m', min: 0, max: 50, color: '#1565c0', radius: 4000 },
+      //   { center: [-2.510, 32.920], elevation: '50-100m', min: 50, max: 100, color: '#1976d2', radius: 2500 },
+      //   { center: [-2.510, 32.920], elevation: '100-150m', min: 100, max: 150, color: '#42a5f5', radius: 1200 },
+      //   { center: [-2.5075, 32.920], elevation: '150-200m', min: 150, max: 200, color: '#90caf9', radius: 600 }
+      // ];
 
+      // elevationData.forEach((zone, index) => {
+      //   const circle = L.circle(zone.center, {
+      //     color: zone.color,
+      //     fillColor: zone.color,
+      //     fillOpacity: 0.3,
+      //     weight: 1,
+      //     radius: zone.radius
+      //   }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>⛰️ Elevation Zone</h4>
+      //       <p><strong>Range:</strong> ${zone.elevation}</p>
+      //       <p><strong>Data Source:</strong> NASA SRTM 30m</p>
+      //       <p><strong>Resolution:</strong> 30m</p>
+      //     </div>
+      //   `);
 
+      //   setTimeout(() => {
+      //     circle.addTo(layerGroups.dem);
+      //     const elem = circle.getElement();
+      //     if (elem) {
+      //       elem.style.animation = 'glow 4s ease-in-out infinite';
+      //       elem.style.animationDelay = `${index * 0.5}s`;
+      //     }
+      //   }, 500 + index * 150);
 
-// ========================================
-// DIGITAL ELEVATION MODEL (Colored Points from CSV)
-// ========================================
-function getElevationColor(elevation) {
-  if (elevation >= 1134 && elevation <= 1150) {
-    return '#4caf50'; // Green - Low elevation
-  } else if (elevation >= 1151 && elevation <= 1200) {
-    return '#ff9800'; // Orange - Medium elevation
-  } else if (elevation >= 1201 && elevation <= 1402) {
-    return '#f44336'; // Red - High elevation
-  }
-  return '#9e9e9e'; // Gray - Unknown
-}
+      //   elevationZones.push({ layer: circle, min: zone.min, max: zone.max });
+      // });
 
-function getElevationClass(elevation) {
-  if (elevation >= 1134 && elevation <= 1150) return 'Low';
-  if (elevation >= 1151 && elevation <= 1200) return 'Medium';
-  if (elevation >= 1201 && elevation <= 1402) return 'High';
-  return 'Unknown';
-}
+      // ========================================
+      // DIGITAL ELEVATION MODEL (Colored Points from CSV)
+      // ========================================
+      function getElevationColor(elevation) {
+        if (elevation >= 1134 && elevation <= 1150) {
+          return "#4caf50"; // Green - Low elevation
+        } else if (elevation >= 1151 && elevation <= 1200) {
+          return "#ff9800"; // Orange - Medium elevation
+        } else if (elevation >= 1201 && elevation <= 1402) {
+          return "#f44336"; // Red - High elevation
+        }
+        return "#9e9e9e"; // Gray - Unknown
+      }
 
-// Fetch and parse CSV file
-fetch('data/Mwanza_elevation.csv')
-  .then(response => response.text())
-  .then(csvText => {
-    console.log('Elevation CSV loaded');
-    
-    // Parse CSV manually (skip header row)
-    const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',');
-    
-    // Process each data row
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',');
-      
-      const latitude = parseFloat(values[0]);
-      const longitude = parseFloat(values[1]);
-      const elevation = parseFloat(values[2]);
-      
-      // Skip invalid data
-      if (isNaN(latitude) || isNaN(longitude) || isNaN(elevation)) continue;
-      
-      const color = getElevationColor(elevation);
-      const elevClass = getElevationClass(elevation);
-      
-      // Create circle marker (small point, not large circle)
-      const circle = L.circleMarker([latitude, longitude], {
-        radius: 4,
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.7,
-        weight: 1,
-        opacity: 1
-      }).bindPopup(`
+      function getElevationClass(elevation) {
+        if (elevation >= 1134 && elevation <= 1150) return "Low";
+        if (elevation >= 1151 && elevation <= 1200) return "Medium";
+        if (elevation >= 1201 && elevation <= 1402) return "High";
+        return "Unknown";
+      }
+
+      // Fetch and parse CSV file
+      fetch("data/Mwanza_elevation.csv")
+        .then((response) => response.text())
+        .then((csvText) => {
+          console.log("Elevation CSV loaded");
+
+          // Parse CSV manually (skip header row)
+          const lines = csvText.trim().split("\n");
+          const headers = lines[0].split(",");
+
+          // Process each data row
+          for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(",");
+
+            const latitude = parseFloat(values[0]);
+            const longitude = parseFloat(values[1]);
+            const elevation = parseFloat(values[2]);
+
+            // Skip invalid data
+            if (isNaN(latitude) || isNaN(longitude) || isNaN(elevation))
+              continue;
+
+            const color = getElevationColor(elevation);
+            const elevClass = getElevationClass(elevation);
+
+            // Create circle marker (small point, not large circle)
+            const circle = L.circleMarker([latitude, longitude], {
+              radius: 4,
+              color: color,
+              fillColor: color,
+              fillOpacity: 0.7,
+              weight: 1,
+              opacity: 1,
+            }).bindPopup(`
         <div class="popup-content">
           <h4>⛰️ Elevation Point</h4>
           <p><strong>Elevation:</strong> ${elevation} m</p>
-          <p><strong>Class:</strong> <span class="badge badge-${elevClass === 'High' ? 'danger' : elevClass === 'Medium' ? 'warning' : 'success'}">${elevClass}</span></p>
+          <p><strong>Class:</strong> <span class="badge badge-${elevClass === "High" ? "danger" : elevClass === "Medium" ? "warning" : "success"}">${elevClass}</span></p>
           <p><strong>Coordinates:</strong><br>Lat: ${latitude.toFixed(6)}°<br>Lng: ${longitude.toFixed(6)}°</p>
           <p><strong>Data Source:</strong> NASA SRTM 30m</p>
         </div>
       `);
-      
-      circle.addTo(layerGroups.dem);
-      
-      // Store for filtering
-      elevationZones.push({ 
-        layer: circle, 
-        min: elevation, 
-        max: elevation 
-      });
-    }
-    
-    console.log(`Loaded ${lines.length - 1} elevation points`);
-  })
-  .catch(error => console.error('Error loading elevation CSV:', error));
 
+            circle.addTo(layerGroups.dem);
 
+            // Store for filtering
+            elevationZones.push({
+              layer: circle,
+              min: elevation,
+              max: elevation,
+            });
+          }
 
-// // ========================================
-// // DIGITAL ELEVATION MODEL (Glowing Circles) - FROM GEOJSON
-// // ========================================
-// function getElevationColor(elevClass) {
-//   // User-friendly color scheme
-//   if (elevClass === 'Low') return '#4caf50';      // Green (safe, lower elevation)
-//   if (elevClass === 'Medium') return '#ff9800';   // Orange (moderate elevation)
-//   if (elevClass === 'High') return '#f44336';     // Red (high elevation, potential risk)
-//   return '#9e9e9e'; // Gray fallback
-// }
+          console.log(`Loaded ${lines.length - 1} elevation points`);
+        })
+        .catch((error) => console.error("Error loading elevation CSV:", error));
 
-// function getElevationRadius(elevClass) {
-//   // Different sizes for visual distinction
-//   if (elevClass === 'Low') return 300;
-//   if (elevClass === 'Medium') return 250;
-//   if (elevClass === 'High') return 200;
-//   return 200;
-// }
+      // // ========================================
+      // // DIGITAL ELEVATION MODEL (Glowing Circles) - FROM GEOJSON
+      // // ========================================
+      // function getElevationColor(elevClass) {
+      //   // User-friendly color scheme
+      //   if (elevClass === 'Low') return '#4caf50';      // Green (safe, lower elevation)
+      //   if (elevClass === 'Medium') return '#ff9800';   // Orange (moderate elevation)
+      //   if (elevClass === 'High') return '#f44336';     // Red (high elevation, potential risk)
+      //   return '#9e9e9e'; // Gray fallback
+      // }
 
-// fetch('data/elevation.geojson')
-//   .then(response => response.json())
-//   .then(data => {
-//     console.log('Elevation data loaded:', data.features.length, 'points');
-    
-//     data.features.forEach((feature, index) => {
-//       const props = feature.properties;
-//       const coords = feature.geometry.coordinates;
-      
-//       const color = getElevationColor(props.elev_class);
-//       const radius = getElevationRadius(props.elev_class);
-      
-//       const circle = L.circle([coords[1], coords[0]], {
-//         color: color,
-//         fillColor: color,
-//         fillOpacity: 0.4,
-//         weight: 2,
-//         radius: radius
-//       }).bindPopup(`
-//         <div class="popup-content">
-//           <h4>⛰️ Elevation Point</h4>
-//           <p><strong>Classification:</strong> <span class="badge badge-${props.elev_class === 'High' ? 'danger' : props.elev_class === 'Medium' ? 'warning' : 'success'}">${props.elev_class}</span></p>
-//           <p><strong>Altitude:</strong> ${props.altitude.toFixed(2)} m</p>
-//           <p><strong>Actual Height:</strong> ${props.actual_hei.toFixed(2)} m</p>
-//           <p><strong>Point ID:</strong> ${props.fid}</p>
-//           <p><strong>Notes:</strong> ${props.comments}</p>
-//           <p><strong>Data Source:</strong> NASA SRTM 30m</p>
-//         </div>
-//       `);
-      
-//       setTimeout(() => {
-//         circle.addTo(layerGroups.dem);
-//         const elem = circle.getElement();
-//         if (elem) {
-//           elem.style.animation = 'glow 4s ease-in-out infinite';
-//           elem.style.animationDelay = `${index * 0.02}s`; // Faster stagger for many points
-//         }
-//       }, 500 + index * 10); // Faster loading for many points
-      
-//       // Store for DEM range filtering (using altitude values)
-//       elevationZones.push({ 
-//         layer: circle, 
-//         min: Math.floor(props.altitude), 
-//         max: Math.ceil(props.altitude) 
-//       });
-//     });
-//   })
-//   .catch(error => console.error('Error loading elevation data:', error));
+      // function getElevationRadius(elevClass) {
+      //   // Different sizes for visual distinction
+      //   if (elevClass === 'Low') return 300;
+      //   if (elevClass === 'Medium') return 250;
+      //   if (elevClass === 'High') return 200;
+      //   return 200;
+      // }
 
+      // fetch('data/elevation.geojson')
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     console.log('Elevation data loaded:', data.features.length, 'points');
 
+      //     data.features.forEach((feature, index) => {
+      //       const props = feature.properties;
+      //       const coords = feature.geometry.coordinates;
 
-// // ========================================
-// // DIGITAL ELEVATION MODEL (Glowing Circles) - FROM GEOJSON
-// // ========================================
-// fetch('data/elevation.geojson')
-//   .then(response => response.json())
-//   .then(data => {
-//     data.features.forEach((feature, index) => {
-//       const props = feature.properties;
-//       const coords = feature.geometry.coordinates;
-      
-//       const circle = L.circle([coords[1], coords[0]], {
-//         color: props.color,
-//         fillColor: props.color,
-//         fillOpacity: 0.3,
-//         weight: 1,
-//         radius: props.radius
-//       }).bindPopup(`
-//         <div class="popup-content">
-//           <h4>⛰️ Elevation Zone</h4>
-//           <p><strong>Range:</strong> ${props.elevation}</p>
-//           <p><strong>Data Source:</strong> NASA SRTM 30m</p>
-//           <p><strong>Resolution:</strong> 30m</p>
-//         </div>
-//       `);
-      
-//       setTimeout(() => {
-//         circle.addTo(layerGroups.dem);
-//         const elem = circle.getElement();
-//         if (elem) {
-//           elem.style.animation = 'glow 4s ease-in-out infinite';
-//           elem.style.animationDelay = `${index * 0.5}s`;
-//         }
-//       }, 500 + index * 150);
-      
-//       elevationZones.push({ layer: circle, min: props.min, max: props.max });
-//     });
-//   })
-//   .catch(error => console.error('Error loading elevation data:', error));
+      //       const color = getElevationColor(props.elev_class);
+      //       const radius = getElevationRadius(props.elev_class);
 
+      //       const circle = L.circle([coords[1], coords[0]], {
+      //         color: color,
+      //         fillColor: color,
+      //         fillOpacity: 0.4,
+      //         weight: 2,
+      //         radius: radius
+      //       }).bindPopup(`
+      //         <div class="popup-content">
+      //           <h4>⛰️ Elevation Point</h4>
+      //           <p><strong>Classification:</strong> <span class="badge badge-${props.elev_class === 'High' ? 'danger' : props.elev_class === 'Medium' ? 'warning' : 'success'}">${props.elev_class}</span></p>
+      //           <p><strong>Altitude:</strong> ${props.altitude.toFixed(2)} m</p>
+      //           <p><strong>Actual Height:</strong> ${props.actual_hei.toFixed(2)} m</p>
+      //           <p><strong>Point ID:</strong> ${props.fid}</p>
+      //           <p><strong>Notes:</strong> ${props.comments}</p>
+      //           <p><strong>Data Source:</strong> NASA SRTM 30m</p>
+      //         </div>
+      //       `);
 
-// // ========================================
-// // LAND USE / LAND COVER (Shimmering Circles)
-// // ========================================
-// const landUse = [
-//   { type: 'Urban', center: [-2.5125, 32.9125], color: '#e53935', radius: 900 },
-//   { type: 'Urban', center: [-2.4925, 32.9125], color: '#e53935', radius: 900 },
-//   { type: 'Vegetation', center: [-2.4775, 32.8975], color: '#43a047', radius: 900 },
-//   { type: 'Vegetation', center: [-2.5275, 32.8975], color: '#43a047', radius: 900 },
-//   { type: 'Water', center: [-2.5525, 32.9575], color: '#1976d2', radius: 900 }
-// ];
+      //       setTimeout(() => {
+      //         circle.addTo(layerGroups.dem);
+      //         const elem = circle.getElement();
+      //         if (elem) {
+      //           elem.style.animation = 'glow 4s ease-in-out infinite';
+      //           elem.style.animationDelay = `${index * 0.02}s`; // Faster stagger for many points
+      //         }
+      //       }, 500 + index * 10); // Faster loading for many points
 
-// landUse.forEach((area, index) => {
-//   const circle = L.circle(area.center, {
-//     color: area.color,
-//     fillColor: area.color,
-//     fillOpacity: 0.25,
-//     weight: 1,
-//     radius: area.radius
-//   }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>🌳 Land Use: ${area.type}</h4>
-//       <p><strong>Data Source:</strong> ESA WorldCover 10m</p>
-//       <p><strong>Classification:</strong> ${area.type}</p>
-//     </div>
-//   `);
-  
-//   setTimeout(() => {
-//     circle.addTo(layerGroups.lulc);
-//     const elem = circle.getElement();
-//     if (elem) {
-//       elem.style.animation = 'shimmer 3s ease-in-out infinite';
-//       elem.style.animationDelay = `${index * 0.4}s`;
-//     }
-//   }, 600 + index * 100);
-// });
+      //       // Store for DEM range filtering (using altitude values)
+      //       elevationZones.push({
+      //         layer: circle,
+      //         min: Math.floor(props.altitude),
+      //         max: Math.ceil(props.altitude)
+      //       });
+      //     });
+      //   })
+      //   .catch(error => console.error('Error loading elevation data:', error));
 
+      // // ========================================
+      // // DIGITAL ELEVATION MODEL (Glowing Circles) - FROM GEOJSON
+      // // ========================================
+      // fetch('data/elevation.geojson')
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     data.features.forEach((feature, index) => {
+      //       const props = feature.properties;
+      //       const coords = feature.geometry.coordinates;
 
-// ========================================
-// LAND USE / LAND COVER (Shimmering Circles) - FROM GEOJSON
-// ========================================
-fetch('data/landuse.geojson')
-  .then(response => response.json())
-  .then(data => {
-    data.features.forEach((feature, index) => {
-      const props = feature.properties;
-      const coords = feature.geometry.coordinates;
-      
-      const circle = L.circle([coords[1], coords[0]], {
-        color: props.color,
-        fillColor: props.color,
-        fillOpacity: 0.25,
-        weight: 1,
-        radius: props.radius
-      }).bindPopup(`
+      //       const circle = L.circle([coords[1], coords[0]], {
+      //         color: props.color,
+      //         fillColor: props.color,
+      //         fillOpacity: 0.3,
+      //         weight: 1,
+      //         radius: props.radius
+      //       }).bindPopup(`
+      //         <div class="popup-content">
+      //           <h4>⛰️ Elevation Zone</h4>
+      //           <p><strong>Range:</strong> ${props.elevation}</p>
+      //           <p><strong>Data Source:</strong> NASA SRTM 30m</p>
+      //           <p><strong>Resolution:</strong> 30m</p>
+      //         </div>
+      //       `);
+
+      //       setTimeout(() => {
+      //         circle.addTo(layerGroups.dem);
+      //         const elem = circle.getElement();
+      //         if (elem) {
+      //           elem.style.animation = 'glow 4s ease-in-out infinite';
+      //           elem.style.animationDelay = `${index * 0.5}s`;
+      //         }
+      //       }, 500 + index * 150);
+
+      //       elevationZones.push({ layer: circle, min: props.min, max: props.max });
+      //     });
+      //   })
+      //   .catch(error => console.error('Error loading elevation data:', error));
+
+      // // ========================================
+      // // LAND USE / LAND COVER (Shimmering Circles)
+      // // ========================================
+      // const landUse = [
+      //   { type: 'Urban', center: [-2.5125, 32.9125], color: '#e53935', radius: 900 },
+      //   { type: 'Urban', center: [-2.4925, 32.9125], color: '#e53935', radius: 900 },
+      //   { type: 'Vegetation', center: [-2.4775, 32.8975], color: '#43a047', radius: 900 },
+      //   { type: 'Vegetation', center: [-2.5275, 32.8975], color: '#43a047', radius: 900 },
+      //   { type: 'Water', center: [-2.5525, 32.9575], color: '#1976d2', radius: 900 }
+      // ];
+
+      // landUse.forEach((area, index) => {
+      //   const circle = L.circle(area.center, {
+      //     color: area.color,
+      //     fillColor: area.color,
+      //     fillOpacity: 0.25,
+      //     weight: 1,
+      //     radius: area.radius
+      //   }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>🌳 Land Use: ${area.type}</h4>
+      //       <p><strong>Data Source:</strong> ESA WorldCover 10m</p>
+      //       <p><strong>Classification:</strong> ${area.type}</p>
+      //     </div>
+      //   `);
+
+      //   setTimeout(() => {
+      //     circle.addTo(layerGroups.lulc);
+      //     const elem = circle.getElement();
+      //     if (elem) {
+      //       elem.style.animation = 'shimmer 3s ease-in-out infinite';
+      //       elem.style.animationDelay = `${index * 0.4}s`;
+      //     }
+      //   }, 600 + index * 100);
+      // });
+
+      // ========================================
+      // LAND USE / LAND COVER (Shimmering Circles) - FROM GEOJSON
+      // ========================================
+      fetch("data/landuse.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          data.features.forEach((feature, index) => {
+            const props = feature.properties;
+            const coords = feature.geometry.coordinates;
+
+            const circle = L.circle([coords[1], coords[0]], {
+              color: props.color,
+              fillColor: props.color,
+              fillOpacity: 0.25,
+              weight: 1,
+              radius: props.radius,
+            }).bindPopup(`
         <div class="popup-content">
           <h4>🌳 Land Use: ${props.type}</h4>
           <p><strong>Data Source:</strong> ESA WorldCover 10m</p>
           <p><strong>Classification:</strong> ${props.type}</p>
         </div>
       `);
-      
-      setTimeout(() => {
-        circle.addTo(layerGroups.lulc);
-        const elem = circle.getElement();
-        if (elem) {
-          elem.style.animation = 'shimmer 3s ease-in-out infinite';
-          elem.style.animationDelay = `${index * 0.4}s`;
-        }
-      }, 600 + index * 100);
-    });
-  })
-  .catch(error => console.error('Error loading land use data:', error));
 
+            setTimeout(
+              () => {
+                circle.addTo(layerGroups.lulc);
+                const elem = circle.getElement();
+                if (elem) {
+                  elem.style.animation = "shimmer 3s ease-in-out infinite";
+                  elem.style.animationDelay = `${index * 0.4}s`;
+                }
+              },
+              600 + index * 100,
+            );
+          });
+        })
+        .catch((error) => console.error("Error loading land use data:", error));
 
-// // ========================================
-// // FLOOD HAZARD ZONES (Rippling Circles)
-// // ========================================
-// const floodZones = [
-//   { center: [-2.5175, 32.9225], risk: 'High', returnPeriod: '10-year', depth: '1.5-3m', radius: 900 },
-//   { center: [-2.5025, 32.9275], risk: 'High', returnPeriod: '10-year', depth: '1-2m', radius: 850 },
-//   { center: [-2.4875, 32.9125], risk: 'Medium', returnPeriod: '25-year', depth: '0.5-1m', radius: 900 },
-//   { center: [-2.5325, 32.9375], risk: 'Medium', returnPeriod: '25-year', depth: '0.5-1.5m', radius: 900 },
-//   { center: [-2.4775, 32.8975], risk: 'Low', returnPeriod: '100-year', depth: '0.3-0.5m', radius: 900 }
-// ];
+      // // ========================================
+      // // FLOOD HAZARD ZONES (Rippling Circles)
+      // // ========================================
+      // const floodZones = [
+      //   { center: [-2.5175, 32.9225], risk: 'High', returnPeriod: '10-year', depth: '1.5-3m', radius: 900 },
+      //   { center: [-2.5025, 32.9275], risk: 'High', returnPeriod: '10-year', depth: '1-2m', radius: 850 },
+      //   { center: [-2.4875, 32.9125], risk: 'Medium', returnPeriod: '25-year', depth: '0.5-1m', radius: 900 },
+      //   { center: [-2.5325, 32.9375], risk: 'Medium', returnPeriod: '25-year', depth: '0.5-1.5m', radius: 900 },
+      //   { center: [-2.4775, 32.8975], risk: 'Low', returnPeriod: '100-year', depth: '0.3-0.5m', radius: 900 }
+      // ];
 
-// floodZones.forEach((zone, index) => {
-//   const color = zone.risk === 'High' ? '#d32f2f' : zone.risk === 'Medium' ? '#f57c00' : '#fbc02d';
-  
-//   const circle = L.circle(zone.center, {
-//     color: color,
-//     fillColor: color,
-//     fillOpacity: 0.4,
-//     weight: 2,
-//     radius: zone.radius
-//   }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>⚠️ Flood Risk: ${zone.risk}</h4>
-//       <p><strong>Return Period:</strong> ${zone.returnPeriod}</p>
-//       <p><strong>Expected Depth:</strong> ${zone.depth}</p>
-//       <p><strong>Data Source:</strong> GFDRR / UNOSAT</p>
-//     </div>
-//   `);
-  
-//   setTimeout(() => {
-//     circle.addTo(layerGroups.flood);
-//     const elem = circle.getElement();
-//     if (elem) {
-//       elem.style.animation = 'ripple 2.5s ease-in-out infinite';
-//       elem.style.animationDelay = `${index * 0.3}s`;
-//     }
-//   }, 700 + index * 120);
-// });
+      // floodZones.forEach((zone, index) => {
+      //   const color = zone.risk === 'High' ? '#d32f2f' : zone.risk === 'Medium' ? '#f57c00' : '#fbc02d';
 
+      //   const circle = L.circle(zone.center, {
+      //     color: color,
+      //     fillColor: color,
+      //     fillOpacity: 0.4,
+      //     weight: 2,
+      //     radius: zone.radius
+      //   }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>⚠️ Flood Risk: ${zone.risk}</h4>
+      //       <p><strong>Return Period:</strong> ${zone.returnPeriod}</p>
+      //       <p><strong>Expected Depth:</strong> ${zone.depth}</p>
+      //       <p><strong>Data Source:</strong> GFDRR / UNOSAT</p>
+      //     </div>
+      //   `);
 
-// ========================================
-// FLOOD HAZARD ZONES (Rippling Circles) - FROM GEOJSON
-// ========================================
-fetch('data/flood_zones.geojson')
-  .then(response => response.json())
-  .then(data => {
-    data.features.forEach((feature, index) => {
-      const props = feature.properties;
-      const coords = feature.geometry.coordinates;
-      
-      const color = props.risk === 'High' ? '#d32f2f' : props.risk === 'Medium' ? '#f57c00' : '#fbc02d';
-      
-      const circle = L.circle([coords[1], coords[0]], {
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.4,
-        weight: 2,
-        radius: props.radius
-      }).bindPopup(`
+      //   setTimeout(() => {
+      //     circle.addTo(layerGroups.flood);
+      //     const elem = circle.getElement();
+      //     if (elem) {
+      //       elem.style.animation = 'ripple 2.5s ease-in-out infinite';
+      //       elem.style.animationDelay = `${index * 0.3}s`;
+      //     }
+      //   }, 700 + index * 120);
+      // });
+
+      // ========================================
+      // FLOOD HAZARD ZONES (Rippling Circles) - FROM GEOJSON
+      // ========================================
+      fetch("data/flood_zones.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          data.features.forEach((feature, index) => {
+            const props = feature.properties;
+            const coords = feature.geometry.coordinates;
+
+            const color =
+              props.risk === "High"
+                ? "#d32f2f"
+                : props.risk === "Medium"
+                  ? "#f57c00"
+                  : "#fbc02d";
+
+            const circle = L.circle([coords[1], coords[0]], {
+              color: color,
+              fillColor: color,
+              fillOpacity: 0.4,
+              weight: 2,
+              radius: props.radius,
+            }).bindPopup(`
         <div class="popup-content">
           <h4>⚠️ Flood Risk: ${props.risk}</h4>
           <p><strong>Return Period:</strong> ${props.return_period}</p>
@@ -1623,886 +1335,945 @@ fetch('data/flood_zones.geojson')
           <p><strong>Data Source:</strong> GFDRR / UNOSAT</p>
         </div>
       `);
-      
-      setTimeout(() => {
-        circle.addTo(layerGroups.flood);
-        const elem = circle.getElement();
-        if (elem) {
-          elem.style.animation = 'ripple 2.5s ease-in-out infinite';
-          elem.style.animationDelay = `${index * 0.3}s`;
-        }
-      }, 700 + index * 120);
-    });
-  })
-  .catch(error => console.error('Error loading flood zones:', error));
 
-// // ========================================
-// // CRITICAL INFRASTRUCTURE (OpenStreetMap)
-// // ========================================
-// const infrastructure = {
-//   hospitals: [
-//     { name: 'Bugando Medical Centre', lat: -2.5100, lng: 32.9150, beds: 850 },
-//     { name: 'Sekou Toure Hospital', lat: -2.5250, lng: 32.9200, beds: 350 },
-//     { name: 'Nyamagana Hospital', lat: -2.5180, lng: 32.9080, beds: 200 }
-//   ],
-//   schools: [
-//     { name: 'Mwanza Secondary School', lat: -2.5140, lng: 32.9100, students: 1200 },
-//     { name: 'Lake Victoria School', lat: -2.5050, lng: 32.9180, students: 850 },
-//     { name: 'Ilemela Primary School', lat: -2.4950, lng: 32.9150, students: 650 }
-//   ],
-//   // waterFacilities: [
-//   //   { name: 'Mwanza Water Treatment Plant', lat: -2.5200, lng: 32.9250, capacity: '50,000 m³/day' },
-//   //   { name: 'Pumping Station A', lat: -2.5080, lng: 32.9120, capacity: '25,000 m³/day' }
-//   // ]
-// };
+            setTimeout(
+              () => {
+                circle.addTo(layerGroups.flood);
+                const elem = circle.getElement();
+                if (elem) {
+                  elem.style.animation = "ripple 2.5s ease-in-out infinite";
+                  elem.style.animationDelay = `${index * 0.3}s`;
+                }
+              },
+              700 + index * 120,
+            );
+          });
+        })
+        .catch((error) => console.error("Error loading flood zones:", error));
 
-// const hospitalIcon = L.divIcon({
-//   html: '<div class="pulse-marker" style="background: #e53935; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏥</div>',
-//   className: '', iconSize: [32, 32]
-// });
+      // // ========================================
+      // // CRITICAL INFRASTRUCTURE (OpenStreetMap)
+      // // ========================================
+      // const infrastructure = {
+      //   hospitals: [
+      //     { name: 'Bugando Medical Centre', lat: -2.5100, lng: 32.9150, beds: 850 },
+      //     { name: 'Sekou Toure Hospital', lat: -2.5250, lng: 32.9200, beds: 350 },
+      //     { name: 'Nyamagana Hospital', lat: -2.5180, lng: 32.9080, beds: 200 }
+      //   ],
+      //   schools: [
+      //     { name: 'Mwanza Secondary School', lat: -2.5140, lng: 32.9100, students: 1200 },
+      //     { name: 'Lake Victoria School', lat: -2.5050, lng: 32.9180, students: 850 },
+      //     { name: 'Ilemela Primary School', lat: -2.4950, lng: 32.9150, students: 650 }
+      //   ],
+      //   // waterFacilities: [
+      //   //   { name: 'Mwanza Water Treatment Plant', lat: -2.5200, lng: 32.9250, capacity: '50,000 m³/day' },
+      //   //   { name: 'Pumping Station A', lat: -2.5080, lng: 32.9120, capacity: '25,000 m³/day' }
+      //   // ]
+      // };
 
-// const schoolIcon = L.divIcon({
-//   html: '<div class="pulse-marker" style="background: #fb8c00; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏫</div>',
-//   className: '', iconSize: [32, 32]
-// });
+      // const hospitalIcon = L.divIcon({
+      //   html: '<div class="pulse-marker" style="background: #e53935; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏥</div>',
+      //   className: '', iconSize: [32, 32]
+      // });
 
-// const waterIcon = L.divIcon({
-//   html: '<div class="pulse-marker" style="background: #1976d2; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🚰</div>',
-//   className: '', iconSize: [32, 32]
-// });
+      // const schoolIcon = L.divIcon({
+      //   html: '<div class="pulse-marker" style="background: #fb8c00; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏫</div>',
+      //   className: '', iconSize: [32, 32]
+      // });
 
-// infrastructure.hospitals.forEach(h => {
-//   L.marker([h.lat, h.lng], { icon: hospitalIcon }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>🏥 ${h.name}</h4>
-//       <p><strong>Beds:</strong> ${h.beds}</p>
-//       <p><strong>Flood Risk:</strong> <span class="badge badge-danger">High</span></p>
-//       <p><strong>Data Source:</strong> OpenStreetMap</p>
-//     </div>
-//   `).addTo(layerGroups.infrastructure);
-// });
+      // const waterIcon = L.divIcon({
+      //   html: '<div class="pulse-marker" style="background: #1976d2; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🚰</div>',
+      //   className: '', iconSize: [32, 32]
+      // });
 
-// infrastructure.schools.forEach(s => {
-//   L.marker([s.lat, s.lng], { icon: schoolIcon }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>🏫 ${s.name}</h4>
-//       <p><strong>Students:</strong> ${s.students}</p>
-//       <p><strong>Data Source:</strong> OpenStreetMap</p>
-//     </div>
-//   `).addTo(layerGroups.infrastructure);
-// });
+      // infrastructure.hospitals.forEach(h => {
+      //   L.marker([h.lat, h.lng], { icon: hospitalIcon }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>🏥 ${h.name}</h4>
+      //       <p><strong>Beds:</strong> ${h.beds}</p>
+      //       <p><strong>Flood Risk:</strong> <span class="badge badge-danger">High</span></p>
+      //       <p><strong>Data Source:</strong> OpenStreetMap</p>
+      //     </div>
+      //   `).addTo(layerGroups.infrastructure);
+      // });
 
-// infrastructure.waterFacilities.forEach(w => {
-//   L.marker([w.lat, w.lng], { icon: waterIcon }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>🚰 ${w.name}</h4>
-//       <p><strong>Capacity:</strong> ${w.capacity}</p>
-//       <p><strong>Status:</strong> <span class="badge badge-success">Operational</span></p>
-//       <p><strong>Data Source:</strong> LVBWB</p>
-//     </div>
-//   `).addTo(layerGroups.infrastructure);
-// });
+      // infrastructure.schools.forEach(s => {
+      //   L.marker([s.lat, s.lng], { icon: schoolIcon }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>🏫 ${s.name}</h4>
+      //       <p><strong>Students:</strong> ${s.students}</p>
+      //       <p><strong>Data Source:</strong> OpenStreetMap</p>
+      //     </div>
+      //   `).addTo(layerGroups.infrastructure);
+      // });
 
+      // infrastructure.waterFacilities.forEach(w => {
+      //   L.marker([w.lat, w.lng], { icon: waterIcon }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>🚰 ${w.name}</h4>
+      //       <p><strong>Capacity:</strong> ${w.capacity}</p>
+      //       <p><strong>Status:</strong> <span class="badge badge-success">Operational</span></p>
+      //       <p><strong>Data Source:</strong> LVBWB</p>
+      //     </div>
+      //   `).addTo(layerGroups.infrastructure);
+      // });
 
+      // // ========================================
+      // // CRITICAL INFRASTRUCTURE (OpenStreetMap) - FROM GEOJSON
+      // // ========================================
+      // const hospitalIcon = L.divIcon({
+      //   html: '<div class="pulse-marker" style="background: #e53935; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏥</div>',
+      //   className: '', iconSize: [32, 32]
+      // });
 
-// // ========================================
-// // CRITICAL INFRASTRUCTURE (OpenStreetMap) - FROM GEOJSON
-// // ========================================
-// const hospitalIcon = L.divIcon({
-//   html: '<div class="pulse-marker" style="background: #e53935; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏥</div>',
-//   className: '', iconSize: [32, 32]
-// });
+      // const schoolIcon = L.divIcon({
+      //   html: '<div class="pulse-marker" style="background: #fb8c00; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏫</div>',
+      //   className: '', iconSize: [32, 32]
+      // });
 
-// const schoolIcon = L.divIcon({
-//   html: '<div class="pulse-marker" style="background: #fb8c00; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏫</div>',
-//   className: '', iconSize: [32, 32]
-// });
+      // // const waterIcon = L.divIcon({
+      // //   html: '<div class="pulse-marker" style="background: #1976d2; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🚰</div>',
+      // //   className: '', iconSize: [32, 32]
+      // // });
 
-// // const waterIcon = L.divIcon({
-// //   html: '<div class="pulse-marker" style="background: #1976d2; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🚰</div>',
-// //   className: '', iconSize: [32, 32]
-// // });
+      // fetch('data/infrastructure.geojson')
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     data.features.forEach(feature => {
+      //       const props = feature.properties;
+      //       const coords = feature.geometry.coordinates;
 
-// fetch('data/infrastructure.geojson')
-//   .then(response => response.json())
-//   .then(data => {
-//     data.features.forEach(feature => {
-//       const props = feature.properties;
-//       const coords = feature.geometry.coordinates;
-      
-//       let icon;
-//       let popupContent = '';
-      
-//       if (props.type === 'hospital') {
-//         icon = hospitalIcon;
-//         popupContent = `
-//           <div class="popup-content">
-//             <h4>🏥 ${props.name}</h4>
-//             <p><strong>Beds:</strong> ${props.beds}</p>
-//             <p><strong>Flood Risk:</strong> <span class="badge badge-danger">High</span></p>
-//             <p><strong>Data Source:</strong> OpenStreetMap</p>
-//           </div>
-//         `;
-//       } else if (props.type === 'school') {
-//         icon = schoolIcon;
-//         popupContent = `
-//           <div class="popup-content">
-//             <h4>🏫 ${props.name}</h4>
-//             <p><strong>Students:</strong> ${props.students}</p>
-//             <p><strong>Data Source:</strong> OpenStreetMap</p>
-//           </div>
-//         `;
-//       } else if (props.type === 'water_facility') {
-//         icon = waterIcon;
-//         popupContent = `
-//           <div class="popup-content">
-//             <h4>🚰 ${props.name}</h4>
-//             <p><strong>Capacity:</strong> ${props.capacity}</p>
-//             <p><strong>Status:</strong> <span class="badge badge-success">Operational</span></p>
-//             <p><strong>Data Source:</strong> LVBWB</p>
-//           </div>
-//         `;
-//       }
-      
-//       L.marker([coords[1], coords[0]], { icon: icon })
-//         .bindPopup(popupContent)
-//         .addTo(layerGroups.infrastructure);
-//     });
-//   })
-//   .catch(error => console.error('Error loading infrastructure:', error));
+      //       let icon;
+      //       let popupContent = '';
 
+      //       if (props.type === 'hospital') {
+      //         icon = hospitalIcon;
+      //         popupContent = `
+      //           <div class="popup-content">
+      //             <h4>🏥 ${props.name}</h4>
+      //             <p><strong>Beds:</strong> ${props.beds}</p>
+      //             <p><strong>Flood Risk:</strong> <span class="badge badge-danger">High</span></p>
+      //             <p><strong>Data Source:</strong> OpenStreetMap</p>
+      //           </div>
+      //         `;
+      //       } else if (props.type === 'school') {
+      //         icon = schoolIcon;
+      //         popupContent = `
+      //           <div class="popup-content">
+      //             <h4>🏫 ${props.name}</h4>
+      //             <p><strong>Students:</strong> ${props.students}</p>
+      //             <p><strong>Data Source:</strong> OpenStreetMap</p>
+      //           </div>
+      //         `;
+      //       } else if (props.type === 'water_facility') {
+      //         icon = waterIcon;
+      //         popupContent = `
+      //           <div class="popup-content">
+      //             <h4>🚰 ${props.name}</h4>
+      //             <p><strong>Capacity:</strong> ${props.capacity}</p>
+      //             <p><strong>Status:</strong> <span class="badge badge-success">Operational</span></p>
+      //             <p><strong>Data Source:</strong> LVBWB</p>
+      //           </div>
+      //         `;
+      //       }
 
+      //       L.marker([coords[1], coords[0]], { icon: icon })
+      //         .bindPopup(popupContent)
+      //         .addTo(layerGroups.infrastructure);
+      //     });
+      //   })
+      //   .catch(error => console.error('Error loading infrastructure:', error));
 
-// ========================================
-// CRITICAL INFRASTRUCTURE (OpenStreetMap) - FROM GEOJSON
-// ========================================
-const hospitalIcon = L.divIcon({
-  html: '<div class="pulse-marker" style="background: #e53935; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏥</div>',
-  className: '', iconSize: [32, 32]
-});
+      // ========================================
+      // CRITICAL INFRASTRUCTURE (OpenStreetMap) - FROM GEOJSON
+      // ========================================
+      const hospitalIcon = L.divIcon({
+        html: '<div class="pulse-marker" style="background: #e53935; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏥</div>',
+        className: "",
+        iconSize: [32, 32],
+      });
 
-const schoolIcon = L.divIcon({
-  html: '<div class="pulse-marker" style="background: #fb8c00; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏫</div>',
-  className: '', iconSize: [32, 32]
-});
+      const schoolIcon = L.divIcon({
+        html: '<div class="pulse-marker" style="background: #fb8c00; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏫</div>',
+        className: "",
+        iconSize: [32, 32],
+      });
 
-// Separate layer groups for hospitals and schools
-const hospitalLayers = L.layerGroup();
-const schoolLayers = L.layerGroup();
+      // Separate layer groups for hospitals and schools
+      const hospitalLayers = L.layerGroup();
+      const schoolLayers = L.layerGroup();
 
-// Add to map initially
-hospitalLayers.addTo(map);
-schoolLayers.addTo(map);
+      // Add to map initially
+      hospitalLayers.addTo(map);
+      schoolLayers.addTo(map);
 
-fetch('data/infrastructure.geojson')
-  .then(response => response.json())
-  .then(data => {
-    console.log('Infrastructure data loaded:', data.features.length, 'features');
-    
-    data.features.forEach(feature => {
-      const props = feature.properties;
-      const coords = feature.geometry.coordinates;
-      
-      let icon;
-      let popupContent = '';
-      let targetLayer = null;
-      
-      if (props.type === 'hospital') {
-        icon = hospitalIcon;
-        targetLayer = hospitalLayers;
-        popupContent = `
+      fetch("data/infrastructure.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(
+            "Infrastructure data loaded:",
+            data.features.length,
+            "features",
+          );
+
+          data.features.forEach((feature) => {
+            const props = feature.properties;
+            const coords = feature.geometry.coordinates;
+
+            let icon;
+            let popupContent = "";
+            let targetLayer = null;
+
+            if (props.type === "hospital") {
+              icon = hospitalIcon;
+              targetLayer = hospitalLayers;
+              popupContent = `
           <div class="popup-content">
             <h4>🏥 ${props.name}</h4>
-            <p><strong>Beds:</strong> ${props.beds || 'N/A'}</p>
+            <p><strong>Beds:</strong> ${props.beds || "N/A"}</p>
             <p><strong>Flood Risk:</strong> <span class="badge badge-danger">High</span></p>
             <p><strong>Data Source:</strong> OpenStreetMap</p>
           </div>
         `;
-      } else if (props.type === 'school') {
-        icon = schoolIcon;
-        targetLayer = schoolLayers;
-        popupContent = `
+            } else if (props.type === "school") {
+              icon = schoolIcon;
+              targetLayer = schoolLayers;
+              popupContent = `
           <div class="popup-content">
             <h4>🏫 ${props.name}</h4>
-            <p><strong>Students:</strong> ${props.students || 'N/A'}</p>
+            <p><strong>Students:</strong> ${props.students || "N/A"}</p>
             <p><strong>Data Source:</strong> OpenStreetMap</p>
           </div>
         `;
-      }
-      
-      // Only create marker if it's hospital or school
-      if (targetLayer) {
-        L.marker([coords[1], coords[0]], { icon: icon })
-          .bindPopup(popupContent)
-          .addTo(targetLayer);
-      }
-    });
-    
-    console.log('Hospitals and schools loaded successfully');
-  })
-  .catch(error => console.error('Error loading infrastructure:', error));
+            }
 
+            // Only create marker if it's hospital or school
+            if (targetLayer) {
+              L.marker([coords[1], coords[0]], { icon: icon })
+                .bindPopup(popupContent)
+                .addTo(targetLayer);
+            }
+          });
 
-// ========================================
-// WATER SUPPLY NETWORK (LVBWB Data)
-// ========================================
-const waterSupplyPoints = [
-  [32.90187819, -2.503408036], [32.90561221, -2.546605187], [32.91502098, -2.562571249], 
-  [32.90455159, -2.494729933], [32.90097245, -2.490887245], [32.88393418, -2.472284515], 
-  [32.91486742, -2.524909995], [32.90876121, -2.480970922], [32.89769279, -2.491455938], 
-  [32.91824187, -2.566689059], [32.90169445, -2.522003793], [32.90192407, -2.523481355], 
-  [32.90328653, -2.520559061], [32.89913688, -2.51748662], [32.89995417, -2.517717166], 
-  [32.90236021, -2.51104205], [32.90154302, -2.510430167], [32.90084018, -2.510233449], 
-  [32.89830909, -2.501051269], [32.90342104, -2.497288654], [32.91082531, -2.49335678], 
-  [32.9398165, -2.533406956], [32.9387093, -2.534263146], [32.93844788, -2.533546591], 
-  [32.91904384, -2.581857775], [32.90475972, -2.507704675], [32.9028062, -2.515889846], 
-  [32.90952068, -2.514210853], [32.90961103, -2.529446518], [32.91173703, -2.528325104], 
-  [32.92967351, -2.600999947], [32.90501542, -2.520670548], [32.9112368, -2.522962936], 
-  [32.99128344, -2.552955631], [32.9004802, -2.524305019], [32.90296266, -2.532632453], 
-  [32.90340665, -2.52390085], [32.90574368, -2.520969795], [32.90748478, -2.519738946], 
-  [32.90069906, -2.517288705], [32.89980782, -2.517169391], [32.90704137, -2.519640712], 
-  [32.90618484, -2.491912983], [32.89970164, -2.507145555], [32.89789871, -2.502637008], 
-  [32.89992766, -2.503196571], [32.89863862, -2.499932904], [32.90027963, -2.497529542], 
-  [32.90409334, -2.49378691], [32.90474348, -2.570479885], [32.90628271, -2.571018876], 
-  [32.91684645, -2.566779516], [32.90761271, -2.538828042], [32.96614782, -2.53486395], 
-  [32.95760553, -2.539000827], [32.95837572, -2.536943379], [32.9568714, -2.535578254], 
-  [32.95905302, -2.535172327], [32.95795337, -2.535505319], [32.95795273, -2.534797362], 
-  [32.95778802, -2.534191829], [32.95679076, -2.535172986], [32.95541017, -2.538908261], 
-  [32.95617366, -2.538960201], [32.95590201, -2.538287201], [32.95543476, -2.537943773], 
-  [32.9549275, -2.537742387], [32.98991409, -2.549561346], [32.94277667, -2.536564098], 
-  [32.9421768, -2.536589132], [32.90444681, -2.522298095], [32.90501351, -2.522398196]
-];
+          console.log("Hospitals and schools loaded successfully");
+        })
+        .catch((error) =>
+          console.error("Error loading infrastructure:", error),
+        );
 
-// let supplyPointSize = 4;
-// let supplyMarkers = [];
-// waterSupplyPoints.forEach((point, index) => {
-//   const circle = L.circleMarker([point[1], point[0]], {
-//     radius: supplyPointSize,
-//     fillColor: '#2196F3',
-//     color: '#ffffff',
-//     weight: 1,
-//     opacity: 1,
-//     fillOpacity: 0.7,
-//     className: 'fade-in'
-//   }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>🚰 Water Supply Point</h4>
-//       <p><strong>Point ID:</strong> WSN-${String(index + 1).padStart(3, '0')}</p>
-//       <p><strong>Coordinates:</strong><br>Lat: ${point[1].toFixed(6)}°<br>Lng: ${point[0].toFixed(6)}°</p>
-//       <p><strong>Network:</strong> Distribution System</p>
-//       <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
-//       <p><strong>Data Source:</strong> Lake Victoria Basin Water Board</p>
-//     </div>
-//   `);
-//   layerGroups.supply.addLayer(circle);
-//   supplyMarkers.push(circle);
-// });
+      // ========================================
+      // WATER SUPPLY NETWORK (LVBWB Data)
+      // ========================================
+      const waterSupplyPoints = [
+        [32.90187819, -2.503408036],
+        [32.90561221, -2.546605187],
+        [32.91502098, -2.562571249],
+        [32.90455159, -2.494729933],
+        [32.90097245, -2.490887245],
+        [32.88393418, -2.472284515],
+        [32.91486742, -2.524909995],
+        [32.90876121, -2.480970922],
+        [32.89769279, -2.491455938],
+        [32.91824187, -2.566689059],
+        [32.90169445, -2.522003793],
+        [32.90192407, -2.523481355],
+        [32.90328653, -2.520559061],
+        [32.89913688, -2.51748662],
+        [32.89995417, -2.517717166],
+        [32.90236021, -2.51104205],
+        [32.90154302, -2.510430167],
+        [32.90084018, -2.510233449],
+        [32.89830909, -2.501051269],
+        [32.90342104, -2.497288654],
+        [32.91082531, -2.49335678],
+        [32.9398165, -2.533406956],
+        [32.9387093, -2.534263146],
+        [32.93844788, -2.533546591],
+        [32.91904384, -2.581857775],
+        [32.90475972, -2.507704675],
+        [32.9028062, -2.515889846],
+        [32.90952068, -2.514210853],
+        [32.90961103, -2.529446518],
+        [32.91173703, -2.528325104],
+        [32.92967351, -2.600999947],
+        [32.90501542, -2.520670548],
+        [32.9112368, -2.522962936],
+        [32.99128344, -2.552955631],
+        [32.9004802, -2.524305019],
+        [32.90296266, -2.532632453],
+        [32.90340665, -2.52390085],
+        [32.90574368, -2.520969795],
+        [32.90748478, -2.519738946],
+        [32.90069906, -2.517288705],
+        [32.89980782, -2.517169391],
+        [32.90704137, -2.519640712],
+        [32.90618484, -2.491912983],
+        [32.89970164, -2.507145555],
+        [32.89789871, -2.502637008],
+        [32.89992766, -2.503196571],
+        [32.89863862, -2.499932904],
+        [32.90027963, -2.497529542],
+        [32.90409334, -2.49378691],
+        [32.90474348, -2.570479885],
+        [32.90628271, -2.571018876],
+        [32.91684645, -2.566779516],
+        [32.90761271, -2.538828042],
+        [32.96614782, -2.53486395],
+        [32.95760553, -2.539000827],
+        [32.95837572, -2.536943379],
+        [32.9568714, -2.535578254],
+        [32.95905302, -2.535172327],
+        [32.95795337, -2.535505319],
+        [32.95795273, -2.534797362],
+        [32.95778802, -2.534191829],
+        [32.95679076, -2.535172986],
+        [32.95541017, -2.538908261],
+        [32.95617366, -2.538960201],
+        [32.95590201, -2.538287201],
+        [32.95543476, -2.537943773],
+        [32.9549275, -2.537742387],
+        [32.98991409, -2.549561346],
+        [32.94277667, -2.536564098],
+        [32.9421768, -2.536589132],
+        [32.90444681, -2.522298095],
+        [32.90501351, -2.522398196],
+      ];
 
+      // let supplyPointSize = 4;
+      // let supplyMarkers = [];
+      // waterSupplyPoints.forEach((point, index) => {
+      //   const circle = L.circleMarker([point[1], point[0]], {
+      //     radius: supplyPointSize,
+      //     fillColor: '#2196F3',
+      //     color: '#ffffff',
+      //     weight: 1,
+      //     opacity: 1,
+      //     fillOpacity: 0.7,
+      //     className: 'fade-in'
+      //   }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>🚰 Water Supply Point</h4>
+      //       <p><strong>Point ID:</strong> WSN-${String(index + 1).padStart(3, '0')}</p>
+      //       <p><strong>Coordinates:</strong><br>Lat: ${point[1].toFixed(6)}°<br>Lng: ${point[0].toFixed(6)}°</p>
+      //       <p><strong>Network:</strong> Distribution System</p>
+      //       <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
+      //       <p><strong>Data Source:</strong> Lake Victoria Basin Water Board</p>
+      //     </div>
+      //   `);
+      //   layerGroups.supply.addLayer(circle);
+      //   supplyMarkers.push(circle);
+      // });
 
-// ========================================
-// WATER SUPPLY NETWORK (LVBWB Data) - FROM GEOJSON
-// ========================================
-let supplyPointSize = 4;
-let supplyMarkers = [];
+      // ========================================
+      // WATER SUPPLY NETWORK (LVBWB Data) - FROM GEOJSON
+      // ========================================
+      let supplyPointSize = 4;
+      let supplyMarkers = [];
 
-fetch('data/water_supply.geojson')
-  .then(response => response.json())
-  .then(data => {
-    data.features.forEach((feature, index) => {
-      const coords = feature.geometry.coordinates;
-      const props = feature.properties;
-      
-      const circle = L.circleMarker([coords[1], coords[0]], {
-        radius: supplyPointSize,
-        fillColor: '#2196F3',
-        color: '#ffffff',
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.7,
-        className: 'fade-in'
-      }).bindPopup(`
+      fetch("data/water_supply.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          data.features.forEach((feature, index) => {
+            const coords = feature.geometry.coordinates;
+            const props = feature.properties;
+
+            const circle = L.circleMarker([coords[1], coords[0]], {
+              radius: supplyPointSize,
+              fillColor: "#2196F3",
+              color: "#ffffff",
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.7,
+              className: "fade-in",
+            }).bindPopup(`
         <div class="popup-content">
           <h4>🚰 Water Supply Point</h4>
-          <p><strong>Point ID:</strong> ${props.id || `WSN-${String(index + 1).padStart(3, '0')}`}</p>
+          <p><strong>Point ID:</strong> ${props.id || `WSN-${String(index + 1).padStart(3, "0")}`}</p>
           <p><strong>Coordinates:</strong><br>Lat: ${coords[1].toFixed(6)}°<br>Lng: ${coords[0].toFixed(6)}°</p>
           <p><strong>Network:</strong> Distribution System</p>
           <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
           <p><strong>Data Source:</strong> Lake Victoria Basin Water Board</p>
         </div>
       `);
-      
-      layerGroups.supply.addLayer(circle);
-      supplyMarkers.push(circle);
-    });
-  })
-  .catch(error => console.error('Error loading water supply network:', error));
 
+            layerGroups.supply.addLayer(circle);
+            supplyMarkers.push(circle);
+          });
+        })
+        .catch((error) =>
+          console.error("Error loading water supply network:", error),
+        );
 
+      // ========================================
+      // WATER BOARD CLIENTS
+      // ========================================
+      // const clients = [
+      //   { id: 'C001', name: 'John Mbwana', lat: -2.5120, lng: 32.9140, permit: 'Active', bill: 'Paid' },
+      //   { id: 'C002', name: 'Mary Kamugisha', lat: -2.5080, lng: 32.9180, permit: 'Active', bill: 'Pending' },
+      //   { id: 'C003', name: 'Peter Mwita', lat: -2.5190, lng: 32.9100, permit: 'Active', bill: 'Paid' },
+      //   { id: 'C004', name: 'Sarah Nyamwiza', lat: -2.5150, lng: 32.9220, permit: 'Expiring', bill: 'Overdue' }
+      // ];
 
+      // const clientIcon = L.divIcon({
+      //   html: '<div class="pulse-marker" style="background: #43a047; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">👤</div>',
+      //   className: '', iconSize: [28, 28]
+      // });
 
-// ========================================
-// WATER BOARD CLIENTS
-// ========================================
-// const clients = [
-//   { id: 'C001', name: 'John Mbwana', lat: -2.5120, lng: 32.9140, permit: 'Active', bill: 'Paid' },
-//   { id: 'C002', name: 'Mary Kamugisha', lat: -2.5080, lng: 32.9180, permit: 'Active', bill: 'Pending' },
-//   { id: 'C003', name: 'Peter Mwita', lat: -2.5190, lng: 32.9100, permit: 'Active', bill: 'Paid' },
-//   { id: 'C004', name: 'Sarah Nyamwiza', lat: -2.5150, lng: 32.9220, permit: 'Expiring', bill: 'Overdue' }
-// ];
+      // clients.forEach(c => {
+      //   L.marker([c.lat, c.lng], { icon: clientIcon }).bindPopup(`
+      //     <div class="popup-content">
+      //       <h4>👤 ${c.name}</h4>
+      //       <p><strong>Client ID:</strong> ${c.id}</p>
+      //       <p><strong>Permit Status:</strong> <span class="badge badge-${c.permit === 'Active' ? 'success' : 'warning'}">${c.permit}</span></p>
+      //       <p><strong>Billing:</strong> <span class="badge badge-${c.bill === 'Paid' ? 'success' : 'warning'}">${c.bill}</span></p>
+      //     </div>
+      //   `).addTo(layerGroups.clients);
+      // });
 
-// const clientIcon = L.divIcon({
-//   html: '<div class="pulse-marker" style="background: #43a047; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">👤</div>',
-//   className: '', iconSize: [28, 28]
-// });
+      // Layer control functions
+      // function toggleMainLayer(layerName) {
+      //   const checkbox = document.getElementById(`layer${layerName.charAt(0).toUpperCase() + layerName.slice(1)}`);
+      //   const layer = layerGroups[layerName];
 
-// clients.forEach(c => {
-//   L.marker([c.lat, c.lng], { icon: clientIcon }).bindPopup(`
-//     <div class="popup-content">
-//       <h4>👤 ${c.name}</h4>
-//       <p><strong>Client ID:</strong> ${c.id}</p>
-//       <p><strong>Permit Status:</strong> <span class="badge badge-${c.permit === 'Active' ? 'success' : 'warning'}">${c.permit}</span></p>
-//       <p><strong>Billing:</strong> <span class="badge badge-${c.bill === 'Paid' ? 'success' : 'warning'}">${c.bill}</span></p>
-//     </div>
-//   `).addTo(layerGroups.clients);
-// });
+      //   if (checkbox.checked) {
+      //     map.addLayer(layer);
+      //   } else {
+      //     map.removeLayer(layer);
+      //   }
+      // }
 
-// Layer control functions
-// function toggleMainLayer(layerName) {
-//   const checkbox = document.getElementById(`layer${layerName.charAt(0).toUpperCase() + layerName.slice(1)}`);
-//   const layer = layerGroups[layerName];
-  
-//   if (checkbox.checked) {
-//     map.addLayer(layer);
-//   } else {
-//     map.removeLayer(layer);
-//   }
-// }
+      // function toggleMainLayer(layerName) {
+      //   const checkbox = document.getElementById(`layer${layerName.charAt(0).toUpperCase() + layerName.slice(1)}`);
 
+      //   // Special handling for infrastructure (hospitals + schools)
+      //   if (layerName === 'infrastructure') {
+      //     if (checkbox.checked) {
+      //       map.addLayer(hospitalLayers);
+      //       map.addLayer(schoolLayers);
+      //       console.log('Infrastructure enabled');
+      //     } else {
+      //       map.removeLayer(hospitalLayers);
+      //       map.removeLayer(schoolLayers);
+      //       console.log('Infrastructure disabled');
+      //     }
+      //   } else {
+      //     // Normal layer handling
+      //     const layer = layerGroups[layerName];
+      //     if (layer) {
+      //       if (checkbox.checked) {
+      //         map.addLayer(layer);
+      //       } else {
+      //         map.removeLayer(layer);
+      //       }
+      //     }
+      //   }
+      // }
 
+      function toggleMainLayer(layerName) {
+        // Build the checkbox ID based on layerName
+        let checkboxId = "";
 
+        if (layerName === "admin") checkboxId = "layerAdmin";
+        else if (layerName === "rivers") checkboxId = "layerRivers";
+        else if (layerName === "dem") checkboxId = "layerDEM";
+        else if (layerName === "lulc") checkboxId = "layerLULC";
+        else if (layerName === "flood") checkboxId = "layerFlood";
+        else if (layerName === "infrastructure") checkboxId = "layerInfra";
+        else if (layerName === "supply") checkboxId = "layerSupply";
+        else if (layerName === "clients") checkboxId = "layerClients";
+        else if (layerName === "population") checkboxId = "layerPopulation";
 
-// function toggleMainLayer(layerName) {
-//   const checkbox = document.getElementById(`layer${layerName.charAt(0).toUpperCase() + layerName.slice(1)}`);
-  
-//   // Special handling for infrastructure (hospitals + schools)
-//   if (layerName === 'infrastructure') {
-//     if (checkbox.checked) {
-//       map.addLayer(hospitalLayers);
-//       map.addLayer(schoolLayers);
-//       console.log('Infrastructure enabled');
-//     } else {
-//       map.removeLayer(hospitalLayers);
-//       map.removeLayer(schoolLayers);
-//       console.log('Infrastructure disabled');
-//     }
-//   } else {
-//     // Normal layer handling
-//     const layer = layerGroups[layerName];
-//     if (layer) {
-//       if (checkbox.checked) {
-//         map.addLayer(layer);
-//       } else {
-//         map.removeLayer(layer);
-//       }
-//     }
-//   }
-// }
+        const checkbox = document.getElementById(checkboxId);
 
+        // Check if checkbox exists
+        if (!checkbox) {
+          console.error(`Checkbox not found: ${checkboxId}`);
+          return;
+        }
 
-function toggleMainLayer(layerName) {
-  // Build the checkbox ID based on layerName
-  let checkboxId = '';
-  
-  if (layerName === 'admin') checkboxId = 'layerAdmin';
-  else if (layerName === 'rivers') checkboxId = 'layerRivers';
-  else if (layerName === 'dem') checkboxId = 'layerDEM';
-  else if (layerName === 'lulc') checkboxId = 'layerLULC';
-  else if (layerName === 'flood') checkboxId = 'layerFlood';
-  else if (layerName === 'infrastructure') checkboxId = 'layerInfra';
-  else if (layerName === 'supply') checkboxId = 'layerSupply';
-  else if (layerName === 'clients') checkboxId = 'layerClients';
-  else if (layerName === 'population') checkboxId = 'layerPopulation';
-  
-  const checkbox = document.getElementById(checkboxId);
-  
-  // Check if checkbox exists
-  if (!checkbox) {
-    console.error(`Checkbox not found: ${checkboxId}`);
-    return;
-  }
-  
-  // Special handling for infrastructure (hospitals + schools)
-  if (layerName === 'infrastructure') {
-    if (checkbox.checked) {
-      map.addLayer(hospitalLayers);
-      map.addLayer(schoolLayers);
-      console.log('Infrastructure enabled');
-    } else {
-      map.removeLayer(hospitalLayers);
-      map.removeLayer(schoolLayers);
-      console.log('Infrastructure disabled');
-    }
-  } else {
-    // Normal layer handling
-    const layer = layerGroups[layerName];
-    if (layer) {
-      if (checkbox.checked) {
-        map.addLayer(layer);
-      } else {
-        map.removeLayer(layer);
+        // Special handling for infrastructure (hospitals + schools)
+        if (layerName === "infrastructure") {
+          if (checkbox.checked) {
+            map.addLayer(hospitalLayers);
+            map.addLayer(schoolLayers);
+            console.log("Infrastructure enabled");
+          } else {
+            map.removeLayer(hospitalLayers);
+            map.removeLayer(schoolLayers);
+            console.log("Infrastructure disabled");
+          }
+        } else {
+          // Normal layer handling
+          const layer = layerGroups[layerName];
+          if (layer) {
+            if (checkbox.checked) {
+              map.addLayer(layer);
+            } else {
+              map.removeLayer(layer);
+            }
+          }
+        }
       }
-    }
-  }
-}
 
-function toggleLayerOptions(layerName) {
-  const options = document.getElementById(`options-${layerName}`);
-  if (options) {
-    options.classList.toggle('active');
-  }
-}
+      function toggleLayerOptions(layerName) {
+        const options = document.getElementById(`options-${layerName}`);
+        if (options) {
+          options.classList.toggle("active");
+        }
+      }
 
-function toggleSubLayer(sublayerName) {
-  console.log(`Toggle sublayer: ${sublayerName}`);
-  
-  // Handle infrastructure sublayers
-  if (sublayerName === 'hospitals') {
-    const checkbox = document.getElementById('sublayer-hospitals');
-    if (checkbox.checked) {
-      map.addLayer(hospitalLayers);
-      console.log('Hospitals shown');
-    } else {
-      map.removeLayer(hospitalLayers);
-      console.log('Hospitals hidden');
-    }
-  }
-  
-  if (sublayerName === 'schools') {
-    const checkbox = document.getElementById('sublayer-schools');
-    if (checkbox.checked) {
-      map.addLayer(schoolLayers);
-      console.log('Schools shown');
-    } else {
-      map.removeLayer(schoolLayers);
-      console.log('Schools hidden');
-    }
-  }
-}
-function changeOpacity(layerName, value) {
-  layerGroups[layerName].eachLayer(layer => {
-    if (layer.setStyle) {
-      layer.setStyle({ fillOpacity: value / 100 });
-    }
-  });
-}
+      function toggleSubLayer(sublayerName) {
+        console.log(`Toggle sublayer: ${sublayerName}`);
 
-function updateDEMRange(value) {
-  document.getElementById('demRange').textContent = `0-${value}m`;
-  
-  elevationZones.forEach(zone => {
-    if (zone.max <= parseInt(value)) {
-      zone.layer.setStyle({ fillOpacity: 0.3, opacity: 1 });
-    } else {
-      zone.layer.setStyle({ fillOpacity: 0.1, opacity: 0.3 });
-    }
-  });
-}
+        // Handle infrastructure sublayers
+        if (sublayerName === "hospitals") {
+          const checkbox = document.getElementById("sublayer-hospitals");
+          if (checkbox.checked) {
+            map.addLayer(hospitalLayers);
+            console.log("Hospitals shown");
+          } else {
+            map.removeLayer(hospitalLayers);
+            console.log("Hospitals hidden");
+          }
+        }
 
-function updateSupplyPointSize(value) {
-  supplyPointSize = parseInt(value);
-  supplyMarkers.forEach(marker => {
-    if (marker.setRadius) {
-      marker.setRadius(supplyPointSize);
-    }
-  });
-}
+        if (sublayerName === "schools") {
+          const checkbox = document.getElementById("sublayer-schools");
+          if (checkbox.checked) {
+            map.addLayer(schoolLayers);
+            console.log("Schools shown");
+          } else {
+            map.removeLayer(schoolLayers);
+            console.log("Schools hidden");
+          }
+        }
+      }
+      function changeOpacity(layerName, value) {
+        layerGroups[layerName].eachLayer((layer) => {
+          if (layer.setStyle) {
+            layer.setStyle({ fillOpacity: value / 100 });
+          }
+        });
+      }
 
-// Chart: Risk distribution
-const ctx = document.getElementById('riskChart').getContext('2d');
-new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: ['Nyamagana', 'Ilemela', 'Pamba', 'Mirongo', 'Igoma'],
-    datasets: [{
-      label: 'Population at Risk',
-      data: [12450, 8320, 9870, 7250, 5890],
-      backgroundColor: ['#e53935', '#fb8c00', '#e53935', '#e53935', '#fb8c00']
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      y: { beginAtZero: true }
-    }
-  }
-});
+      function updateDEMRange(value) {
+        document.getElementById("demRange").textContent = `0-${value}m`;
 
-// Add scale control
-L.control.scale({ position: 'bottomright' }).addTo(map);
+        elevationZones.forEach((zone) => {
+          if (zone.max <= parseInt(value)) {
+            zone.layer.setStyle({ fillOpacity: 0.3, opacity: 1 });
+          } else {
+            zone.layer.setStyle({ fillOpacity: 0.1, opacity: 0.3 });
+          }
+        });
+      }
 
+      function updateSupplyPointSize(value) {
+        supplyPointSize = parseInt(value);
+        supplyMarkers.forEach((marker) => {
+          if (marker.setRadius) {
+            marker.setRadius(supplyPointSize);
+          }
+        });
+      }
 
-
-// ========================================
-// WARD ANALYSIS RISK CHART - FROM GEOJSON
-// ========================================
-fetch('data/ward_analysis.geojson')
-  .then(response => response.json())
-  .then(data => {
-    if (data.features && data.features.length > 0) {
-      const labels = data.features.map(f => f.properties.ward);
-      const populations = data.features.map(f => f.properties.population_at_risk || f.properties.population);
-      const colors = data.features.map(f => f.properties.risk === 'High' ? '#e53935' : '#fb8c00');
-      
-      const ctx = document.getElementById('riskChart').getContext('2d');
+      // Chart: Risk distribution
+      const ctx = document.getElementById("riskChart").getContext("2d");
       new Chart(ctx, {
-        type: 'bar',
+        type: "bar",
         data: {
-          labels: labels,
-          datasets: [{
-            label: 'Population at Risk',
-            data: populations,
-            backgroundColor: colors,
-            borderColor: colors.map(c => c === '#e53935' ? '#c62828' : '#f57c00'),
-            borderWidth: 1
-          }]
+          labels: ["Nyamagana", "Ilemela", "Pamba", "Mirongo", "Igoma"],
+          datasets: [
+            {
+              label: "Population at Risk",
+              data: [12450, 8320, 9870, 7250, 5890],
+              backgroundColor: [
+                "#e53935",
+                "#fb8c00",
+                "#e53935",
+                "#e53935",
+                "#fb8c00",
+              ],
+            },
+          ],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            title: {
-              display: true,
-              text: 'Population at Risk by Ward',
-              font: { size: 14, weight: 'bold' },
-              color: '#0d47a1'
-            },
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return 'Population: ' + context.parsed.y.toLocaleString();
-                }
-              }
-            }
           },
           scales: {
-            y: { 
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Population'
-              },
-              ticks: {
-                callback: function(value) {
-                  return value.toLocaleString();
-                }
-              }
-            }
-          }
-        }
+            y: { beginAtZero: true },
+          },
+        },
       });
-      
-      console.log('Risk chart created successfully');
-    }
-  })
-  .catch(error => {
-    console.error('Error loading ward analysis for chart:', error);
-  });
 
+      // Add scale control
+      L.control.scale({ position: "bottomright" }).addTo(map);
 
+      // ========================================
+      // WARD ANALYSIS RISK CHART - FROM GEOJSON
+      // ========================================
+      fetch("data/ward_analysis.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.features && data.features.length > 0) {
+            const labels = data.features.map((f) => f.properties.ward);
+            const populations = data.features.map(
+              (f) => f.properties.population_at_risk || f.properties.population,
+            );
+            const colors = data.features.map((f) =>
+              f.properties.risk === "High" ? "#e53935" : "#fb8c00",
+            );
 
+            const ctx = document.getElementById("riskChart").getContext("2d");
+            new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    label: "Population at Risk",
+                    data: populations,
+                    backgroundColor: colors,
+                    borderColor: colors.map((c) =>
+                      c === "#e53935" ? "#c62828" : "#f57c00",
+                    ),
+                    borderWidth: 1,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Population at Risk by Ward",
+                    font: { size: 14, weight: "bold" },
+                    color: "#0d47a1",
+                  },
+                  legend: { display: false },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        return (
+                          "Population: " + context.parsed.y.toLocaleString()
+                        );
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: "Population",
+                    },
+                    ticks: {
+                      callback: function (value) {
+                        return value.toLocaleString();
+                      },
+                    },
+                  },
+                },
+              },
+            });
 
-// // ========================================
-// // WARD ANALYSIS TABLE & CHART - FROM CSV
-// // ========================================
-// fetch('data/ward_analysis.csv')
-//   .then(response => response.text())
-//   .then(csvText => {
-//     console.log('Ward analysis CSV loaded');
-    
-//     // Parse CSV
-//     const lines = csvText.trim().split('\n');
-//     const wardData = [];
-    
-//     // Process each data row (skip header)
-//     for (let i = 1; i < lines.length; i++) {
-//       const values = lines[i].split(',');
-      
-//       const ward = values[0].trim();
-//       const population = parseInt(values[1].trim());
-//       const risk = values[2].trim();
-      
-//       wardData.push({ ward, population, risk });
-//     }
-    
-//     console.log('Parsed ward data:', wardData);
-    
-//     // ===== POPULATE TABLE =====
-//     const tableBody = document.getElementById('wardAnalysisTable');
-    
-//     if (tableBody) {
-//       tableBody.innerHTML = ''; // Clear loading message
-      
-//       wardData.forEach(data => {
-//         const row = document.createElement('tr');
-        
-//         const riskBadgeClass = data.risk === 'High' ? 'badge-danger' : 
-//                                data.risk === 'Medium' ? 'badge-warning' : 'badge-success';
-        
-//         row.innerHTML = `
-//           <td>${data.ward}</td>
-//           <td>${data.population.toLocaleString()}</td>
-//           <td><span class="badge ${riskBadgeClass}">${data.risk}</span></td>
-//         `;
-        
-//         tableBody.appendChild(row);
-//       });
-      
-//       console.log('Ward analysis table populated with', wardData.length, 'rows');
-//     } else {
-//       console.error('Table body element not found!');
-//     }
-    
-//     // ===== CREATE RISK CHART =====
-//     const labels = wardData.map(w => w.ward);
-//     const populations = wardData.map(w => w.population);
-//     const colors = wardData.map(w => w.risk === 'High' ? '#e53935' : '#fb8c00');
-    
-//     const ctx = document.getElementById('riskChart');
-    
-//     if (ctx) {
-//       new Chart(ctx.getContext('2d'), {
-//         type: 'bar',
-//         data: {
-//           labels: labels,
-//           datasets: [{
-//             label: 'Population at Risk',
-//             data: populations,
-//             backgroundColor: colors,
-//             borderColor: colors.map(c => c === '#e53935' ? '#c62828' : '#f57c00'),
-//             borderWidth: 1
-//           }]
-//         },
-//         options: {
-//           responsive: true,
-//           maintainAspectRatio: false,
-//           plugins: {
-//             title: {
-//               display: true,
-//               text: 'Population at Risk by Ward',
-//               font: { size: 14, weight: 'bold' },
-//               color: '#0d47a1'
-//             },
-//             legend: { display: false },
-//             tooltip: {
-//               callbacks: {
-//                 label: function(context) {
-//                   return 'Population: ' + context.parsed.y.toLocaleString();
-//                 }
-//               }
-//             }
-//           },
-//           scales: {
-//             y: { 
-//               beginAtZero: true,
-//               title: {
-//                 display: true,
-//                 text: 'Population'
-//               },
-//               ticks: {
-//                 callback: function(value) {
-//                   return value.toLocaleString();
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       });
-      
-//       console.log('Risk chart created successfully');
-//     } else {
-//       console.error('Chart canvas element not found!');
-//     }
-//   })
-//   .catch(error => {
-//     console.error('Error loading ward analysis CSV:', error);
-//     const tableBody = document.getElementById('wardAnalysisTable');
-//     if (tableBody) {
-//       tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Error loading data</td></tr>';
-//     }
-//   });
-
-
-// ========================================
-// RAINFALL CHART - FROM CSV
-// ========================================
-fetch('data/rainfall.csv')
-  .then(response => response.text())
-  .then(csvText => {
-    console.log('Rainfall CSV loaded');
-    
-    // Parse CSV
-    const lines = csvText.trim().split('\n');
-    
-    const months = [];
-    const avgRainfall = [];
-    const rainDays = [];
-    
-    // Process each data row (skip header)
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',');
-      
-      const month = values[0];
-      const rainfallRange = values[1]; // e.g., "97-113"
-      const daysRange = values[2]; // e.g., "14"
-      
-      // Extract average from range (e.g., "97-113" -> 105)
-      let rainfallAvg;
-      if (rainfallRange.includes('-')) {
-        const parts = rainfallRange.split('-');
-        const min = parseFloat(parts[0]);
-        const max = parseFloat(parts[1]);
-        rainfallAvg = (min + max) / 2;
-      } else {
-        rainfallAvg = parseFloat(rainfallRange);
-      }
-      
-      // Extract days (handle range if present)
-      let daysAvg;
-      if (daysRange.includes('-')) {
-        const parts = daysRange.split('-');
-        const min = parseFloat(parts[0]);
-        const max = parseFloat(parts[1]);
-        daysAvg = (min + max) / 2;
-      } else {
-        daysAvg = parseFloat(daysRange);
-      }
-      
-      months.push(month);
-      avgRainfall.push(rainfallAvg.toFixed(1));
-      rainDays.push(daysAvg);
-    }
-    
-    console.log('Rainfall data parsed:', months.length, 'months');
-    
-    // Create rainfall chart
-    const ctx2 = document.getElementById('rainfallChart').getContext('2d');
-    new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: months,
-        datasets: [
-          {
-            label: 'Average Rainfall (mm)',
-            data: avgRainfall,
-            backgroundColor: '#2196F3',
-            borderColor: '#1976D2',
-            borderWidth: 1,
-            yAxisID: 'y'
-          },
-          {
-            label: 'Rain Days',
-            data: rainDays,
-            backgroundColor: '#FF9800',
-            borderColor: '#F57C00',
-            borderWidth: 2,
-            yAxisID: 'y1',
-            type: 'line',
-            tension: 0.3,
-            fill: false
+            console.log("Risk chart created successfully");
           }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-          mode: 'index',
-          intersect: false
-        },
-        plugins: {
-          title: {
-            display: true,
-            text: 'Monthly Rainfall Distribution - Mwanza',
-            font: { size: 14, weight: 'bold' },
-            color: '#0d47a1'
-          },
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              boxWidth: 12,
-              font: { size: 11 }
+        })
+        .catch((error) => {
+          console.error("Error loading ward analysis for chart:", error);
+        });
+
+      // // ========================================
+      // // WARD ANALYSIS TABLE & CHART - FROM CSV
+      // // ========================================
+      // fetch('data/ward_analysis.csv')
+      //   .then(response => response.text())
+      //   .then(csvText => {
+      //     console.log('Ward analysis CSV loaded');
+
+      //     // Parse CSV
+      //     const lines = csvText.trim().split('\n');
+      //     const wardData = [];
+
+      //     // Process each data row (skip header)
+      //     for (let i = 1; i < lines.length; i++) {
+      //       const values = lines[i].split(',');
+
+      //       const ward = values[0].trim();
+      //       const population = parseInt(values[1].trim());
+      //       const risk = values[2].trim();
+
+      //       wardData.push({ ward, population, risk });
+      //     }
+
+      //     console.log('Parsed ward data:', wardData);
+
+      //     // ===== POPULATE TABLE =====
+      //     const tableBody = document.getElementById('wardAnalysisTable');
+
+      //     if (tableBody) {
+      //       tableBody.innerHTML = ''; // Clear loading message
+
+      //       wardData.forEach(data => {
+      //         const row = document.createElement('tr');
+
+      //         const riskBadgeClass = data.risk === 'High' ? 'badge-danger' :
+      //                                data.risk === 'Medium' ? 'badge-warning' : 'badge-success';
+
+      //         row.innerHTML = `
+      //           <td>${data.ward}</td>
+      //           <td>${data.population.toLocaleString()}</td>
+      //           <td><span class="badge ${riskBadgeClass}">${data.risk}</span></td>
+      //         `;
+
+      //         tableBody.appendChild(row);
+      //       });
+
+      //       console.log('Ward analysis table populated with', wardData.length, 'rows');
+      //     } else {
+      //       console.error('Table body element not found!');
+      //     }
+
+      //     // ===== CREATE RISK CHART =====
+      //     const labels = wardData.map(w => w.ward);
+      //     const populations = wardData.map(w => w.population);
+      //     const colors = wardData.map(w => w.risk === 'High' ? '#e53935' : '#fb8c00');
+
+      //     const ctx = document.getElementById('riskChart');
+
+      //     if (ctx) {
+      //       new Chart(ctx.getContext('2d'), {
+      //         type: 'bar',
+      //         data: {
+      //           labels: labels,
+      //           datasets: [{
+      //             label: 'Population at Risk',
+      //             data: populations,
+      //             backgroundColor: colors,
+      //             borderColor: colors.map(c => c === '#e53935' ? '#c62828' : '#f57c00'),
+      //             borderWidth: 1
+      //           }]
+      //         },
+      //         options: {
+      //           responsive: true,
+      //           maintainAspectRatio: false,
+      //           plugins: {
+      //             title: {
+      //               display: true,
+      //               text: 'Population at Risk by Ward',
+      //               font: { size: 14, weight: 'bold' },
+      //               color: '#0d47a1'
+      //             },
+      //             legend: { display: false },
+      //             tooltip: {
+      //               callbacks: {
+      //                 label: function(context) {
+      //                   return 'Population: ' + context.parsed.y.toLocaleString();
+      //                 }
+      //               }
+      //             }
+      //           },
+      //           scales: {
+      //             y: {
+      //               beginAtZero: true,
+      //               title: {
+      //                 display: true,
+      //                 text: 'Population'
+      //               },
+      //               ticks: {
+      //                 callback: function(value) {
+      //                   return value.toLocaleString();
+      //                 }
+      //               }
+      //             }
+      //           }
+      //         }
+      //       });
+
+      //       console.log('Risk chart created successfully');
+      //     } else {
+      //       console.error('Chart canvas element not found!');
+      //     }
+      //   })
+      //   .catch(error => {
+      //     console.error('Error loading ward analysis CSV:', error);
+      //     const tableBody = document.getElementById('wardAnalysisTable');
+      //     if (tableBody) {
+      //       tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Error loading data</td></tr>';
+      //     }
+      //   });
+
+      // ========================================
+      // RAINFALL CHART - FROM CSV
+      // ========================================
+      fetch("data/rainfall.csv")
+        .then((response) => response.text())
+        .then((csvText) => {
+          console.log("Rainfall CSV loaded");
+
+          // Parse CSV
+          const lines = csvText.trim().split("\n");
+
+          const months = [];
+          const avgRainfall = [];
+          const rainDays = [];
+
+          // Process each data row (skip header)
+          for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(",");
+
+            const month = values[0];
+            const rainfallRange = values[1]; // e.g., "97-113"
+            const daysRange = values[2]; // e.g., "14"
+
+            // Extract average from range (e.g., "97-113" -> 105)
+            let rainfallAvg;
+            if (rainfallRange.includes("-")) {
+              const parts = rainfallRange.split("-");
+              const min = parseFloat(parts[0]);
+              const max = parseFloat(parts[1]);
+              rainfallAvg = (min + max) / 2;
+            } else {
+              rainfallAvg = parseFloat(rainfallRange);
             }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                let label = context.dataset.label || '';
-                if (label) {
-                  label += ': ';
-                }
-                if (context.parsed.y !== null) {
-                  if (context.dataset.label === 'Average Rainfall (mm)') {
-                    label += context.parsed.y + ' mm';
-                  } else {
-                    label += Math.round(context.parsed.y) + ' days';
-                  }
-                }
-                return label;
-              }
+
+            // Extract days (handle range if present)
+            let daysAvg;
+            if (daysRange.includes("-")) {
+              const parts = daysRange.split("-");
+              const min = parseFloat(parts[0]);
+              const max = parseFloat(parts[1]);
+              daysAvg = (min + max) / 2;
+            } else {
+              daysAvg = parseFloat(daysRange);
             }
+
+            months.push(month);
+            avgRainfall.push(rainfallAvg.toFixed(1));
+            rainDays.push(daysAvg);
           }
-        },
-        scales: {
-          y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            title: {
-              display: true,
-              text: 'Rainfall (mm)',
-              color: '#2196F3',
-              font: { weight: 'bold', size: 11 }
+
+          console.log("Rainfall data parsed:", months.length, "months");
+
+          // Create rainfall chart
+          const ctx2 = document
+            .getElementById("rainfallChart")
+            .getContext("2d");
+          new Chart(ctx2, {
+            type: "bar",
+            data: {
+              labels: months,
+              datasets: [
+                {
+                  label: "Average Rainfall (mm)",
+                  data: avgRainfall,
+                  backgroundColor: "#2196F3",
+                  borderColor: "#1976D2",
+                  borderWidth: 1,
+                  yAxisID: "y",
+                },
+                {
+                  label: "Rain Days",
+                  data: rainDays,
+                  backgroundColor: "#FF9800",
+                  borderColor: "#F57C00",
+                  borderWidth: 2,
+                  yAxisID: "y1",
+                  type: "line",
+                  tension: 0.3,
+                  fill: false,
+                },
+              ],
             },
-            beginAtZero: true,
-            max: 180
-          },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            title: {
-              display: true,
-              text: 'Rain Days',
-              color: '#FF9800',
-              font: { weight: 'bold', size: 11 }
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                mode: "index",
+                intersect: false,
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Monthly Rainfall Distribution - Mwanza",
+                  font: { size: 14, weight: "bold" },
+                  color: "#0d47a1",
+                },
+                legend: {
+                  display: true,
+                  position: "top",
+                  labels: {
+                    boxWidth: 12,
+                    font: { size: 11 },
+                  },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      let label = context.dataset.label || "";
+                      if (label) {
+                        label += ": ";
+                      }
+                      if (context.parsed.y !== null) {
+                        if (context.dataset.label === "Average Rainfall (mm)") {
+                          label += context.parsed.y + " mm";
+                        } else {
+                          label += Math.round(context.parsed.y) + " days";
+                        }
+                      }
+                      return label;
+                    },
+                  },
+                },
+              },
+              scales: {
+                y: {
+                  type: "linear",
+                  display: true,
+                  position: "left",
+                  title: {
+                    display: true,
+                    text: "Rainfall (mm)",
+                    color: "#2196F3",
+                    font: { weight: "bold", size: 11 },
+                  },
+                  beginAtZero: true,
+                  max: 180,
+                },
+                y1: {
+                  type: "linear",
+                  display: true,
+                  position: "right",
+                  title: {
+                    display: true,
+                    text: "Rain Days",
+                    color: "#FF9800",
+                    font: { weight: "bold", size: 11 },
+                  },
+                  beginAtZero: true,
+                  max: 20,
+                  grid: {
+                    drawOnChartArea: false,
+                  },
+                },
+              },
             },
-            beginAtZero: true,
-            max: 20,
-            grid: {
-              drawOnChartArea: false
-            }
-          }
-        }
-      }
-    });
-    
-    console.log('Rainfall chart created successfully');
-  })
-  .catch(error => console.error('Error loading rainfall CSV:', error));
+          });
 
-// Add scale control
-L.control.scale({ position: 'bottomright' }).addTo(map);
+          console.log("Rainfall chart created successfully");
+        })
+        .catch((error) => console.error("Error loading rainfall CSV:", error));
 
+      // Add scale control
+      L.control.scale({ position: "bottomright" }).addTo(map);
 
-
-
-/* 
+      /* 
 ========================================
 AMAZING ANIMATIONS IMPLEMENTED
 ========================================
@@ -2651,7 +2422,6 @@ EXTRA SMALL (<480px):
 - Essential features prioritized
 - Very touch-friendly
 */
-</script>
-
-</body>
+    </script>
+  </body>
 </html>
