@@ -1,0 +1,50 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Nyamagana",
+        "population": 5807,
+        "risk_level": "High"
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Ilemela",
+        "population": 43244,
+        "risk_level": "Medium"
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Pamba",
+        "population": 23519,
+        "risk_level": "High"
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Mirongo",
+        "population": 2925,
+        "risk_level": "High"
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Igoma",
+        "population": 56596,
+        "risk_level": "Unknown"
+      },
+      "geometry": null
+    }
+  ]
+}

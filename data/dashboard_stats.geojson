@@ -1,0 +1,13 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "high_risk_population": 12450,
+        "medium_risk_population": 28320
+      },
+      "geometry": null
+    }
+  ]
+}

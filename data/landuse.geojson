@@ -1,0 +1,70 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Urban",
+        "center": [-2.5125, 32.9125],
+        "color": "#e53935",
+        "radius": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9125, -2.5125]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Urban",
+        "center": [-2.4925, 32.9125],
+        "color": "#e53935",
+        "radius": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9125, -2.4925]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Vegetation",
+        "center": [-2.4775, 32.8975],
+        "color": "#43a047",
+        "radius": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.8975, -2.4775]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Vegetation",
+        "center": [-2.5275, 32.8975],
+        "color": "#43a047",
+        "radius": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.8975, -2.5275]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Water",
+        "center": [-2.5525, 32.9575],
+        "color": "#1976d2",
+        "radius": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9575, -2.5525]
+      }
+    }
+  ]
+}

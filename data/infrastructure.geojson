@@ -1,0 +1,77 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "hospital",
+        "name": "Bugando Medical Centre",
+        "beds": 850
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9150, -2.5100]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "hospital",
+        "name": "Sekou Toure Hospital",
+        "beds": 350
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9200, -2.5250]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "hospital",
+        "name": "Nyamagana Hospital",
+        "beds": 200
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9080, -2.5180]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "school",
+        "name": "Mwanza Secondary School",
+        "students": 1200
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9100, -2.5140]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "school",
+        "name": "Lake Victoria School",
+        "students": 850
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9180, -2.5050]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "school",
+        "name": "Ilemela Primary School",
+        "students": 650
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9150, -2.4950]
+      }
+    }
+  ]
+}

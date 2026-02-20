@@ -1,0 +1,75 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "center": [-2.5175, 32.9225],
+        "risk": "High",
+        "returnPeriod": "10-year",
+        "depth": "1.5-3m",
+        "radius": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9225, -2.5175]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "center": [-2.5025, 32.9275],
+        "risk": "High",
+        "returnPeriod": "10-year",
+        "depth": "1-2m",
+        "radius": 850
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9275, -2.5025]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "center": [-2.4875, 32.9125],
+        "risk": "Medium",
+        "returnPeriod": "25-year",
+        "depth": "0.5-1m",
+        "radius": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9125, -2.4875]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "center": [-2.5325, 32.9375],
+        "risk": "Medium",
+        "returnPeriod": "25-year",
+        "depth": "0.5-1.5m",
+        "radius": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9375, -2.5325]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "center": [-2.4775, 32.8975],
+        "risk": "Low",
+        "returnPeriod": "100-year",
+        "depth": "0.3-0.5m",
+        "radius": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.8975, -2.4775]
+      }
+    }
+  ]
+}

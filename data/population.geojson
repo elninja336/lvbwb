@@ -1,0 +1,299 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Mikuyuni",
+        "lat": -2.550477699,
+        "lng": 32.90915538,
+        "population": 18780,
+        "density": 9503
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.90915538, -2.550477699]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Igogo",
+        "lat": -2.533852115,
+        "lng": 32.90772912,
+        "population": 27303,
+        "density": 12086
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.90772912, -2.533852115]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Pamba",
+        "lat": -2.525155557,
+        "lng": 32.90721542,
+        "population": 23519,
+        "density": 10938
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.90721542, -2.525155557]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Nyamagana",
+        "lat": -2.510692591,
+        "lng": 32.86678536,
+        "population": 5807,
+        "density": 2152
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.86678536, -2.510692591]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Mirongo",
+        "lat": -2.514267907,
+        "lng": 32.90344757,
+        "population": 2925,
+        "density": 7858
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.90344757, -2.514267907]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Isamilo",
+        "lat": -2.507003494,
+        "lng": 32.90749784,
+        "population": 24220,
+        "density": 7865
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.90749784, -2.507003494]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Mbugani",
+        "lat": -2.518173371,
+        "lng": 32.91775296,
+        "population": 39041,
+        "density": 7803
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.91775296, -2.518173371]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Mahina",
+        "lat": -2.55551661,
+        "lng": 32.94687076,
+        "population": 59437,
+        "density": 2810
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.94687076, -2.55551661]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Igoma",
+        "lat": -2.583832556,
+        "lng": 32.99496485,
+        "population": 56596,
+        "density": 1446
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.99496485, -2.583832556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Buhongwa",
+        "lat": -2.616113155,
+        "lng": 32.96496876,
+        "population": 26681,
+        "density": 559
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.96496876, -2.616113155]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Mkolani",
+        "lat": -2.613950357,
+        "lng": 32.89698035,
+        "population": 32199,
+        "density": 798
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.89698035, -2.613950357]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Butimba",
+        "lat": -2.552722035,
+        "lng": 32.88336391,
+        "population": 46944,
+        "density": 2511
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.88336391, -2.552722035]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Buswelu",
+        "lat": -2.524930946,
+        "lng": 32.99592622,
+        "population": 22897,
+        "density": 548
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.99592622, -2.524930946]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Nyakato",
+        "lat": -2.515575176,
+        "lng": 32.94401656,
+        "population": 82348,
+        "density": 5348
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.94401656, -2.515575176]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Nyamanoro",
+        "lat": -2.489071423,
+        "lng": 32.91291517,
+        "population": 51456,
+        "density": 12802
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.91291517, -2.489071423]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Kirumba",
+        "lat": -2.495017951,
+        "lng": 32.8846357,
+        "population": 28103,
+        "density": 6266
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.8846357, -2.495017951]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Kitangiri",
+        "lat": -2.485388617,
+        "lng": 32.89197463,
+        "population": 20802,
+        "density": 5619
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.89197463, -2.485388617]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Pasiansi",
+        "lat": -2.477490785,
+        "lng": 32.90391388,
+        "population": 35723,
+        "density": 4288
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.90391388, -2.477490785]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Ilemela",
+        "lat": -2.473422645,
+        "lng": 32.9617452,
+        "population": 43244,
+        "density": 843
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9617452, -2.473422645]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Bugogwa",
+        "lat": -2.36299816,
+        "lng": 32.92159712,
+        "population": 37312,
+        "density": 510
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.92159712, -2.36299816]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ward": "Sangabuye",
+        "lat": -2.257281343,
+        "lng": 33.04436413,
+        "population": 21116,
+        "density": 383
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [33.04436413, -2.257281343]
+      }
+    }
+  ]
+}

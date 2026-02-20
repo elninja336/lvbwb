@@ -1,0 +1,76 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mirongo River",
+        "length": 14.2,
+        "watershed_area": 58.6,
+        "flow_direction": "South-East"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [32.880, -2.450],
+          [32.895, -2.470],
+          [32.910, -2.490],
+          [32.925, -2.510],
+          [32.940, -2.530],
+          [32.955, -2.550]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mirongo River Tributary 1",
+        "length": 5.1,
+        "watershed_area": 12.4,
+        "flow_direction": "South-East"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [32.890, -2.460],
+          [32.905, -2.480],
+          [32.920, -2.500]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mirongo River Tributary 2",
+        "length": 4.6,
+        "watershed_area": 10.9,
+        "flow_direction": "South-East"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [32.900, -2.500],
+          [32.915, -2.515],
+          [32.930, -2.530]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mirongo River Tributary 3",
+        "length": 4.2,
+        "watershed_area": 9.8,
+        "flow_direction": "South-East"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [32.910, -2.520],
+          [32.925, -2.535],
+          [32.940, -2.550]
+        ]
+      }
+    }
+  ]
+}

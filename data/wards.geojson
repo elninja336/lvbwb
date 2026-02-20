@@ -1,0 +1,61 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nyamagana",
+        "center": [-2.5175, 32.9125],
+        "population": 45230,
+        "risk": "High",
+        "radius": 1700
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9125, -2.5175]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ilemela",
+        "center": [-2.4925, 32.9125],
+        "population": 38150,
+        "risk": "Medium",
+        "radius": 1500
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9125, -2.4925]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pamba",
+        "center": [-2.5425, 32.9125],
+        "population": 32890,
+        "risk": "High",
+        "radius": 1400
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9125, -2.5425]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mirongo",
+        "center": [-2.5175, 32.9375],
+        "population": 28420,
+        "risk": "High",
+        "radius": 1300
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.9375, -2.5175]
+      }
+    }
+  ]
+}
